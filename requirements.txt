@@ -1,0 +1,10 @@
+# Socle minimal : la recherche documentaire fonctionne avec ce seul paquet.
+numpy>=1.26
+
+# LLM + embeddings (llama.cpp). Sur Apple Silicon, compiler avec Metal :
+#   CMAKE_ARGS="-DGGML_METAL=on" pip install llama-cpp-python
+llama-cpp-python>=0.3.0
+
+# Interface web locale (optionnelle)
+fastapi>=0.110
+uvicorn>=0.27

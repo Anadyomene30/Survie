@@ -1,0 +1,43 @@
+# Profils materiels. Le profil est choisi automatiquement d'apres la memoire
+# disponible (voir survie.config.detecter_profil), ou force avec --profil.
+
+[leger]
+description = "Mode economie de batterie, ou machine 8 Go"
+llm_depot = "Qwen/Qwen3-1.7B-GGUF"
+llm_fichier = "Qwen3-1.7B-Q4_K_M.gguf"
+llm_taille_go = 1.1
+contexte = 4096
+ram_minimale_go = 6
+
+[standard]
+description = "MacBook M1 Pro 16 Go - defaut"
+llm_depot = "unsloth/Qwen3-4B-Instruct-2507-GGUF"
+llm_fichier = "Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
+llm_taille_go = 2.5
+contexte = 8192
+ram_minimale_go = 12
+
+[confort]
+description = "M1 Pro/Max 32 Go et plus - meilleur francais"
+llm_depot = "unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF"
+llm_fichier = "Mistral-Small-3.2-24B-Instruct-2506-Q4_K_M.gguf"
+llm_taille_go = 14.0
+contexte = 8192
+ram_minimale_go = 28
+
+# Modele d'embeddings : identique pour tous les profils (~100 Mo, Apache-2.0).
+[embeddings]
+depot = "bartowski/granite-embedding-107m-multilingual-GGUF"
+fichier = "granite-embedding-107m-multilingual-f16.gguf"
+dimension = 384
+
+[recherche]
+# Nombre d'extraits injectes dans le contexte du LLM.
+extraits = 6
+# Part du contenu informatif de la question que le corpus doit couvrir pour
+# qu'une reponse soit autorisee. En dessous, le systeme refuse plutot que
+# d'inventer. Mesure par tests/test_pertinence_corpus.py : les questions
+# couvertes obtiennent 0,47 a 1,00, les questions hors sujet 0,00 a 0,42.
+# La marge est etroite : en cas de doute, refuser coute infiniment moins cher
+# qu'une reponse inventee sur une eau ou une plante.
+seuil_pertinence = 0.30

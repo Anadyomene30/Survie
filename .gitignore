@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# Modeles et index : volumineux, regeneres localement, jamais versionnes
+modeles/
+index/
+bundle/
+config/survie.toml
