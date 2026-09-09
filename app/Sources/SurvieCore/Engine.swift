@@ -22,6 +22,8 @@ public struct Reponse: Sendable {
     public let refus: Bool
     public let identification: Bool
     public let signaux: Retrieve.Signaux?
+    public var divergences: [Divergence] = []
+    public var ecartDates: (Int, Int)?
 }
 
 public actor Engine {
@@ -35,11 +37,16 @@ public actor Engine {
     public let store: Store
     private let embedder: Embedder?
     private let generateur: Generateur?
+    private let registre: [Divergence]
 
-    public init(db: URL, embedder: Embedder? = nil, generateur: Generateur? = nil) throws {
+    public init(db: URL, embedder: Embedder? = nil, generateur: Generateur? = nil,
+                registre: URL? = nil) throws {
         self.store = try Store(url: db)
         self.embedder = embedder
         self.generateur = generateur
+        // Par défaut, à côté de l'index : `make db` les écrit ensemble.
+        let defaut = db.deletingLastPathComponent().appendingPathComponent("divergences.json")
+        self.registre = Divergences.charger(registre ?? defaut)
         // Refuse tôt un index bâti avec un autre modèle : les résultats
         // seraient du bruit, sans le moindre signal d'erreur.
         if let e = embedder { try store.verifierEmbedder(e.nom) }
@@ -56,17 +63,23 @@ public actor Engine {
                            rapport: nil, refus: true, identification: ident, signaux: sig)
         }
 
-        let (sys, user) = Prompt.construire(question: question, hits: hits)
+        let divs = Divergences.detecter(question: question, hits: hits, registre: registre)
+        let ecart = Divergences.ecartDeDates(hits)
+        let encart = Divergences.encart(divs, ecart: ecart)
+
+        let (sys, user) = Prompt.construire(question: question, hits: hits, encart: encart)
         let texte = try await generateur?.generer(systeme: sys, utilisateur: user) ?? ""
 
         guard !texte.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             // Mode extraits seuls : rien n'est reformulé, donc rien à vérifier.
             return Reponse(question: question, texte: "", hits: hits, rapport: nil,
-                           refus: false, identification: ident, signaux: sig)
+                           refus: false, identification: ident, signaux: sig,
+                           divergences: divs, ecartDates: ecart)
         }
         return Reponse(question: question, texte: texte, hits: hits,
                        rapport: Validate.verifier(reponse: texte, hits: hits),
-                       refus: false, identification: ident, signaux: sig)
+                       refus: false, identification: ident, signaux: sig,
+                       divergences: divs, ecartDates: ecart)
     }
 
     private func doitRefuser(_ sig: Retrieve.Signaux) -> Bool {

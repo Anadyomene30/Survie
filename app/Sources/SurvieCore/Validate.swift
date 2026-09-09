@@ -28,8 +28,12 @@ public enum Validate {
         public var taux: Double { citations > 0 ? Double(valides) / Double(citations) : 0 }
     }
 
-    // [identifiant p.42]
-    static let citation = try! NSRegularExpression(
+    /// `[identifiant p.42]`
+    ///
+    /// Publique à dessein : l'interface s'en sert pour rendre les citations
+    /// cliquables. Deux expressions régulières distinctes pour le même format
+    /// finiraient par diverger, et afficheraient une source pour une autre.
+    public static let citation = try! NSRegularExpression(
         pattern: #"\[([a-z0-9][a-z0-9._-]*)\s+p\.\s*(\d+)\]"#, options: [.caseInsensitive])
 
     public static func verifier(reponse: String, hits: [Retrieve.Hit],

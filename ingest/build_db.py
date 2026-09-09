@@ -133,6 +133,11 @@ def build() -> int:
     con.execute("VACUUM")
     con.close()
 
+    # Le registre des doctrines périmées est exporté en JSON à côté de l'index :
+    # l'application Swift le lit sans embarquer d'analyseur YAML, et il reste
+    # éditable en YAML côté dépôt, qui supporte bien mieux les textes longs.
+    _exporter_divergences()
+
     size = config.DB.stat().st_size / 1e6
     print(f"Index construit : {config.DB.relative_to(config.ROOT)} ({size:.1f} Mo)")
     print(f"  {len(rows)} fragments, {len(used)} sources, modèle « {emb_meta['name']} »")
@@ -142,6 +147,29 @@ def build() -> int:
         print("  La recherche sera purement lexicale et de mauvaise qualité.")
         print("  Pour un index utilisable : SURVIE_EMBEDDER=mlx make db")
     return 0
+
+
+def _exporter_divergences() -> None:
+    src = config.CORPUS / "divergences.yaml"
+    if not src.exists():
+        return
+    import yaml
+
+    data = yaml.safe_load(src.read_text(encoding="utf-8")) or {}
+    entrees = data.get("divergences", [])
+    # Les blocs YAML repliés portent des retours à la ligne qui n'ont aucun sens
+    # une fois affichés dans une interface : on les aplatit ici, à l'export.
+    for e in entrees:
+        for cle in ("ancienne", "actuelle", "source", "titre"):
+            if cle in e and isinstance(e[cle], str):
+                e[cle] = " ".join(e[cle].split())
+        # Swift n'applique pas les valeurs par défaut d'une propriété au
+        # décodage : une clé absente ferait échouer tout le registre, donc
+        # supprimerait silencieusement les avertissements. On la force ici.
+        e.setdefault("source", "")
+    (config.BUILD / "divergences.json").write_text(
+        json.dumps(entrees, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print(f"  {len(entrees)} doctrines périmées -> build/divergences.json")
 
 
 def main(argv: list[str] | None = None) -> int:

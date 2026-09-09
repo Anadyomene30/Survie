@@ -97,15 +97,20 @@ public enum Prompt {
         .joined(separator: "\n\n---\n\n")
     }
 
-    public static func construire(question: String,
-                                  hits: [Retrieve.Hit]) -> (systeme: String, utilisateur: String) {
+    /// `encart` porte l'avertissement sur les doctrines ayant changé. Il est
+    /// placé AVANT les extraits : ce qui suit doit être lu à sa lumière, et un
+    /// avertissement relégué en fin d'invite pèse moins qu'un texte de manuel
+    /// bien tourné.
+    public static func construire(question: String, hits: [Retrieve.Hit],
+                                  encart: String = "") -> (systeme: String, utilisateur: String) {
         var sys = systeme
         if estIdentification(question) {
             sys += "\n\nATTENTION : cette question porte sur une identification. " +
                    "La règle de sûreté ci-dessus s'applique impérativement.\n"
         }
+        let tete = encart.isEmpty ? "" : "\(encart)\n\n\(String(repeating: "=", count: 60))\n\n"
         let user = """
-        EXTRAITS DISPONIBLES
+        \(tete)EXTRAITS DISPONIBLES
 
         \(formaterExtraits(hits))
 

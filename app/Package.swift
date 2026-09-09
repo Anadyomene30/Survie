@@ -15,6 +15,7 @@ let package = Package(
     products: [
         .library(name: "SurvieCore", targets: ["SurvieCore"]),
         .executable(name: "survie-cli", targets: ["SurvieCLI"]),
+        .executable(name: "SurvieApp", targets: ["SurvieApp"]),
     ],
     dependencies: [
         // .package(url: "https://github.com/ml-explore/mlx-swift", from: "0.21.0"),
@@ -23,6 +24,19 @@ let package = Package(
     targets: [
         .target(name: "SurvieCore"),
         .executableTarget(name: "SurvieCLI", dependencies: ["SurvieCore"]),
+        // SurvieApp compile SANS MLX : les adaptateurs sont derrière un
+        // #if canImport, et l'application reste utilisable en mode extraits
+        // seuls, le mode urgence fonctionnant intégralement. Ajouter les
+        // dépendances mlx-swift ci-dessus active la génération.
+        .executableTarget(
+            name: "SurvieApp",
+            dependencies: [
+                "SurvieCore",
+                // .product(name: "MLXEmbedders", package: "mlx-swift-lm"),
+                // .product(name: "MLXLLM", package: "mlx-swift-lm"),
+            ],
+            swiftSettings: [.unsafeFlags(["-parse-as-library"])]
+        ),
         .testTarget(name: "SurvieCoreTests", dependencies: ["SurvieCore"]),
     ]
 )
