@@ -15,6 +15,7 @@ extract = [
     "pymupdf>=1.24",
     "ebooklib>=0.18",
     "beautifulsoup4>=4.12",
+    "libzim>=3.13",
 ]
 # Embeddings + LLM sur Apple Silicon. N'installe rien sur Linux.
 mlx = [

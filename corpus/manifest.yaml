@@ -280,6 +280,24 @@ sources:
 # PACK RÉGIONAL — rédigé dans ce dépôt (voir regional/bouriane/)
 # ═══════════════════════════════════════════════════════════════════
 
+  - id: wikipedia-fr
+    titre: "Wikipédia en français (archive Kiwix)"
+    auteur: "Contributeurs de Wikipédia"
+    date: 2026
+    langue: fr
+    licence: cc-by-sa
+    domaine: [encyclopédie, repli]
+    priorite: 3
+    format: zim
+    chemin: corpus/public/wikipedia_fr_all_nopic.zim
+    note: >-
+      Ingestion SÉLECTIVE par semences thématiques (corpus/zim-seeds.yaml) :
+      quelques dizaines de milliers d'articles, jamais les 2,5 millions.
+      Forcée en priorité 3 — c'est un repli, jamais une source de référence.
+      L'archive n'est pas téléchargée automatiquement (une dizaine de Go) :
+      la récupérer sur https://library.kiwix.org et la déposer à ce chemin.
+      La variante « nopic » suffit et divise la taille par cinq.
+
   - id: urgence
     titre: "Checklists d'urgence"
     auteur: "SURVIE — fiches d'urgence"

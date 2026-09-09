@@ -47,12 +47,19 @@ class Source:
         """Source rédigée dans le dépôt (pack régional)."""
         return self.format == "markdown-dir"
 
+    @property
+    def is_zim(self) -> bool:
+        """Archive Kiwix, ingérée sélectivement (voir ingest/zim.py)."""
+        return self.format == "zim"
+
     def local_path(self) -> Path | None:
         """Emplacement du fichier sur disque, une fois récupéré."""
         if self.chemin:
             return config.ROOT / self.chemin
         if self.fichier_attendu:
             return config.ROOT / self.fichier_attendu
+        if self.is_zim:
+            return None
         if self.url:
             suffix = Path(self.url.split("?")[0]).suffix.lower()
             if suffix not in (".pdf", ".epub", ".txt", ".md", ".html", ".zip"):
@@ -85,6 +92,8 @@ def load(path: Path | None = None) -> list[Source]:
         seen.add(src.id)
 
         # Une source libre sans moyen de l'obtenir est une erreur de saisie.
+        if src.format == "zim" and not src.chemin:
+            raise ManifestError(f"{src.id} : format zim mais 'chemin' absent")
         if src.is_free and not (src.url or src.chemin):
             raise ManifestError(f"{src.id} : licence libre mais ni 'url' ni 'chemin'")
         if src.licence == "copyright" and not src.fichier_attendu:

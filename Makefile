@@ -15,6 +15,9 @@ corpus-check:  ## Vérifie que toutes les URLs du manifeste répondent (à lance
 fetch:  ## Télécharge les sources libres de droit -> corpus/public/ + corpus/sources.lock
 	$(PY) python -m ingest.fetch
 
+zim:  ## Aperçu de la sélection d'une archive Kiwix : make zim Z=corpus/public/wikipedia_fr.zim
+	$(PY) python -m ingest.zim "$(Z)"
+
 ingest:  ## Extraction + OCR + découpage -> build/chunks.jsonl (+ vignettes de pages)
 	$(PY) python -m ingest.extract
 	$(PY) python -m ingest.chunk

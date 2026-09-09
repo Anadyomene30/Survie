@@ -142,6 +142,13 @@ réponses ici. C'est précisément ce que le pack corrige.
   inventaire flore Dordogne du CBNSA.
 - **Ouvrages sous droits** (8 déclarés, extensibles) — **jamais téléchargés**.
   À se procurer légalement et à déposer dans `corpus/private/`.
+- **Wikipédia FR hors ligne** (archive Kiwix) — ingérée **sélectivement** par
+  semences thématiques (`corpus/zim-seeds.yaml`) : quelques dizaines de
+  milliers d'articles, jamais les 2,5 millions, et forcée en priorité 3.
+  C'est un repli, pas une source de référence. Ingérer l'encyclopédie entière
+  ferait remonter un article généraliste devant un manuel de médecine de
+  terrain — la latence, elle, tiendrait (47 ms mesurées à 500 000 fragments) ;
+  c'est le bruit qui interdit.
 
 **Liste d'acquisition détaillée et priorisée : [`docs/CORPUS.md`](docs/CORPUS.md).**
 

@@ -169,12 +169,28 @@ def _extract_markdown_dir(src: Source, path: Path) -> list[Page]:
     return pages
 
 
+def _extract_zim(src: Source, path: Path) -> list[Page]:
+    """Archive Kiwix : sélection thématique, jamais l'encyclopédie entière.
+
+    Voir ingest/zim.py — ingérer 2,5 millions d'articles noierait les ouvrages
+    de référence, ce qui est exactement l'inverse du but recherché.
+    """
+    try:
+        from .zim import extraire
+    except ImportError:
+        print(f"  ! libzim absent — {src.id} ignoré (uv sync --extra extract)")
+        return []
+    return [Page(p["numero"], p["texte"], False, 1.0, None) for p in extraire(path)]
+
+
 def extract(src: Source) -> Document | None:
     path = src.local_path()
     if path is None or not path.exists():
         return None
 
-    if src.is_local_dir:
+    if src.is_zim:
+        pages = _extract_zim(src, path)
+    elif src.is_local_dir:
         pages = _extract_markdown_dir(src, path)
     elif path.suffix.lower() == ".pdf":
         pages = _extract_pdf(src, path)

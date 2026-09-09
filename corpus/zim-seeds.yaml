@@ -1,0 +1,183 @@
+# Semences thématiques pour l'ingestion sélective des archives ZIM.
+#
+# POURQUOI CE FICHIER EXISTE
+#
+# Wikipédia FR complet, c'est environ 2,5 millions d'articles. Ingéré tel quel,
+# cela produirait plusieurs millions de fragments, avec trois conséquences :
+#
+#   - le bruit noierait les ouvrages de référence. C'est la raison principale :
+#     un article encyclopédique généraliste remonterait devant un manuel de
+#     médecine de terrain, et la priorité 3 n'y suffirait pas si le volume est
+#     de deux ordres de grandeur supérieur.
+#   - la matrice de vecteurs occuperait 2 Go de mémoire vive, en concurrence
+#     directe avec les 13 Go du modèle sur une machine de 32 Go.
+#
+# Mesuré (numpy, float32, 1024 dimensions) :
+#     40 000 fragments  (ouvrages seuls)     164 Mo    3,3 ms/requête
+#    115 000 fragments  (+ 25 000 articles)  471 Mo    9,7 ms/requête
+#    500 000 fragments  (Wikipédia entier)  2048 Mo   47,7 ms/requête
+#
+# La latence n'est donc PAS l'argument : elle reste acceptable même au pire cas.
+# Ce sont le bruit et la mémoire qui commandent.
+#
+# L'ingestion sélective n'est donc pas une optimisation, c'est une condition de
+# fonctionnement. Les sources ZIM sont en outre forcées en priorite 3, donc
+# déclassées derrière tout ouvrage de référence : elles servent de repli quand
+# rien d'autre ne couvre la question.
+#
+# `max_articles` plafonne la récolte. Si le plafond est atteint, le pipeline
+# le signale : c'est le signe qu'il faut resserrer les semences, pas l'augmenter.
+
+version: 1
+max_articles: 25000
+min_caracteres: 400        # sous ce seuil, l'article est une ébauche sans valeur
+max_caracteres: 60000      # au-delà, on tronque : les articles fleuves diluent
+
+# Namespaces d'articles. Le schéma récent n'utilise que « C » ; l'ancien « A ».
+namespaces: [C, A]
+
+# Titres à écarter d'emblée : listes, homonymies, portails, chronologies.
+# Ils n'apportent aucun contenu exploitable et sont très nombreux.
+exclusions:
+  - "Liste de"
+  - "Liste des"
+  - "Homonymie"
+  - "Portail:"
+  - "Catégorie:"
+  - "Modèle:"
+  - "Wikipédia:"
+  - "Discussion"
+  - "Projet:"
+
+groupes:
+
+  medecine:
+    poids: 1
+    termes:
+      - premiers secours
+      - hémorragie
+      - garrot
+      - réanimation cardio-pulmonaire
+      - hypothermie
+      - gelure
+      - coup de chaleur
+      - déshydratation
+      - fracture
+      - luxation
+      - entorse
+      - plaie
+      - infection
+      - antibiotique
+      - antalgique
+      - brûlure
+      - intoxication alimentaire
+      - botulisme
+      - tétanos
+      - maladie de Lyme
+      - leptospirose
+      - échinococcose
+      - venin
+      - anaphylaxie
+      - état de choc
+      - noyade
+      - traumatisme crânien
+
+  plantes:
+    poids: 1
+    termes:
+      - plante comestible
+      - plante toxique
+      - cueillette
+      - châtaignier
+      - ortie
+      - pissenlit
+      - plantain
+      - sureau noir
+      - ciguë
+      - colchique
+      - digitale pourpre
+      - arum
+      - ail des ours
+      - œnanthe
+      - belladone
+      - fougère aigle
+      - églantier
+      - prunellier
+      - noisetier
+      - ronce
+      - tilleul
+
+  champignons:
+    poids: 1
+    termes:
+      - champignon comestible
+      - amanite phalloïde
+      - cortinaire
+      - lépiote
+      - galerine
+      - bolet
+      - cèpe
+      - girolle
+      - chanterelle
+      - russule
+      - syndrome phalloïdien
+      - syndrome orellanien
+      - mycologie
+
+  survie:
+    poids: 1
+    termes:
+      - survie en milieu sauvage
+      - bushcraft
+      - abri de fortune
+      - allumage du feu
+      - potabilisation
+      - filtration de l'eau
+      - nœud marin
+      - orientation
+      - carte topographique
+      - boussole
+      - étoile polaire
+      - signal de détresse
+      - hypothermie accidentelle
+      - conservation des aliments
+      - lacto-fermentation
+      - fumage
+      - séchage des aliments
+
+  milieu_local:
+    poids: 2          # priorité locale : c'est le terrain de l'utilisateur
+    termes:
+      - Bouriane
+      - Gourdon (Lot)
+      - Lot (département)
+      - Dordogne (département)
+      - Périgord noir
+      - Quercy
+      - Causses du Quercy
+      - Céou
+      - Dordogne (fleuve)
+      - karst
+      - Sidérolithique
+      - châtaigneraie
+      - vipère aspic
+      - sanglier
+      - chevreuil
+      - tique
+
+  technique:
+    poids: 1
+    termes:
+      - radioamateur
+      - bande radioamateur
+      - antenne
+      - météorologie
+      - nuage
+      - orage
+      - foudre
+      - énergie solaire photovoltaïque
+      - batterie électrique
+      - forge
+      - tannage
+      - vannerie
+      - corde
