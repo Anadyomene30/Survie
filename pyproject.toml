@@ -1,0 +1,46 @@
+[project]
+name = "survie"
+version = "0.1.0"
+description = "Assistant de survie conversationnel, 100 % hors-ligne, à citations vérifiées"
+requires-python = ">=3.11"
+dependencies = [
+    "pyyaml>=6.0",
+    "numpy>=1.26",
+    "rich>=13.7",
+]
+
+[project.optional-dependencies]
+# Extraction de documents : lourd, requis seulement pour `make ingest`.
+extract = [
+    "pymupdf>=1.24",
+    "ebooklib>=0.18",
+    "beautifulsoup4>=4.12",
+]
+# Embeddings + LLM sur Apple Silicon. N'installe rien sur Linux.
+mlx = [
+    "mlx>=0.18; platform_machine == 'arm64' and sys_platform == 'darwin'",
+    "mlx-lm>=0.19; platform_machine == 'arm64' and sys_platform == 'darwin'",
+    "sentence-transformers>=3.0",
+]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.6",
+]
+
+[project.scripts]
+survie = "survie.__main__:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["cli/survie", "ingest"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["cli", "."]

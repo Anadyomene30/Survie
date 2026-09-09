@@ -1,0 +1,41 @@
+# --- Corpus : jamais versionné ---
+# Ouvrages sous droits (copie privée, usage strictement personnel)
+corpus/private/
+# Sources libres : re-téléchargeables depuis manifest.yaml
+corpus/public/
+# Artefacts d'ingestion
+corpus/cache/
+build/
+*.db
+*.db-wal
+*.db-shm
+pages/
+
+# --- Modèles ---
+models/
+*.safetensors
+*.gguf
+
+# --- Cartes hors-ligne ---
+regional/*/tiles/
+regional/*/maps/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+
+# --- Swift / Xcode ---
+.build/
+.swiftpm/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+
+# --- macOS ---
+.DS_Store

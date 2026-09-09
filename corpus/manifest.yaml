@@ -1,0 +1,369 @@
+# Catalogue des sources du corpus SURVIE.
+#
+# `licence` pilote le comportement du pipeline :
+#   public-domain / cc-*  -> téléchargé automatiquement par `make fetch`
+#   copyright             -> JAMAIS téléchargé. À déposer manuellement dans corpus/private/.
+#
+# `priorite` pondère le retrieval (1 = source de référence, 3 = repli).
+# `date` sert à afficher l'ancienneté des sources médicales (doctrines évolutives).
+# `langue` : fr / en. Le français est privilégié à score égal.
+
+version: 1
+
+sources:
+
+# ═══════════════════════════════════════════════════════════════════
+# DOCTRINE SURVIE & TERRAIN — domaine public (gouvernement des États-Unis)
+# ═══════════════════════════════════════════════════════════════════
+
+  - id: fm-21-76
+    titre: "FM 21-76 — Survival"
+    auteur: "US Army"
+    date: 1992
+    langue: en
+    licence: public-domain
+    domaine: [survie, abri, feu, eau, alimentation, navigation]
+    priorite: 1
+    url: https://archive.org/download/Fm21-76SurvivalManual/FM21-76_SurvivalManual.pdf
+
+  - id: fm-3-05-70
+    titre: "FM 3-05.70 — Survival (révision de FM 21-76)"
+    auteur: "US Army"
+    date: 2002
+    langue: en
+    licence: public-domain
+    domaine: [survie, abri, feu, eau, alimentation, psychologie]
+    priorite: 1
+    url: https://upload.wikimedia.org/wikipedia/commons/6/6b/FM_3-05.70_%28FM_21-76%29_Survival_-_May_2002.pdf
+
+  - id: fm-21-76-1
+    titre: "FM 21-76-1 — Survival, Evasion and Recovery"
+    auteur: "US Army"
+    date: 1999
+    langue: en
+    licence: public-domain
+    domaine: [survie, signalisation, navigation]
+    priorite: 2
+    url: https://archive.org/download/FM21-76-1SurvivalEvasionAndRecovery/FM%2021-76-1%20Survival%20Evasion%20and%20Recovery.pdf
+
+  - id: fm-3-25-26
+    titre: "FM 3-25.26 — Map Reading and Land Navigation"
+    auteur: "US Army"
+    date: 2001
+    langue: en
+    licence: public-domain
+    domaine: [navigation, cartographie]
+    priorite: 1
+    url: https://archive.org/download/FM3-25.26MapReadingAndLandNavigation/FM%203-25.26.pdf
+
+  - id: fm-21-10
+    titre: "FM 21-10 — Field Hygiene and Sanitation"
+    auteur: "US Army"
+    date: 2000
+    langue: en
+    licence: public-domain
+    domaine: [hygiene, eau, assainissement, sante]
+    priorite: 1
+    url: https://archive.org/download/FM21-10FieldHygieneAndSanitation/FM%2021-10.pdf
+
+  - id: ranger-handbook
+    titre: "Ranger Handbook SH 21-76"
+    auteur: "US Army Ranger School"
+    date: 2017
+    langue: en
+    licence: public-domain
+    domaine: [survie, deplacement, cordage, terrain]
+    priorite: 2
+    url: https://archive.org/download/RangerHandbook2017/Ranger%20Handbook%202017.pdf
+
+# ═══════════════════════════════════════════════════════════════════
+# MÉDECINE EN MILIEU ISOLÉ — libre / Creative Commons
+# ═══════════════════════════════════════════════════════════════════
+
+  - id: wtind
+    titre: "Where There Is No Doctor"
+    auteur: "David Werner — Hesperian Health Guides"
+    date: 2021
+    langue: en
+    licence: cc-by-nc-sa
+    domaine: [medecine, premiers-secours, diagnostic, medicaments]
+    priorite: 1
+    url: https://en.hesperian.org/wp-content/uploads/pdf/en_wtnd_2021/en_wtnd_2021_full_book.pdf
+
+  - id: wtin-dentist
+    titre: "Where There Is No Dentist"
+    auteur: "Murray Dickson — Hesperian Health Guides"
+    date: 2021
+    langue: en
+    licence: cc-by-nc-sa
+    domaine: [medecine, dentaire]
+    priorite: 2
+    url: https://en.hesperian.org/wp-content/uploads/pdf/en_dentist_2021/en_dentist_2021_full_book.pdf
+
+  - id: hesperian-midwives
+    titre: "A Book for Midwives"
+    auteur: "Hesperian Health Guides"
+    date: 2010
+    langue: en
+    licence: cc-by-nc-sa
+    domaine: [medecine, obstetrique]
+    priorite: 3
+    url: https://en.hesperian.org/wp-content/uploads/pdf/en_bfm_2010/en_bfm_2010_full_book.pdf
+
+  - id: msf-guide-clinique
+    titre: "Guide clinique et thérapeutique"
+    auteur: "Médecins Sans Frontières"
+    date: 2024
+    langue: fr
+    licence: libre-acces
+    domaine: [medecine, diagnostic, traitement, infectieux]
+    priorite: 1
+    note: >-
+      Référence médicale francophone majeure du corpus. Consultable et
+      téléchargeable sur medicalguidelines.msf.org (versions PDF et EPUB).
+    url: https://medicalguidelines.msf.org/fr/viewport/CG/francais/guide-clinique-et-therapeutique-16686604.html
+
+  - id: msf-medicaments-essentiels
+    titre: "Médicaments essentiels — guide pratique d'utilisation"
+    auteur: "Médecins Sans Frontières"
+    date: 2024
+    langue: fr
+    licence: libre-acces
+    domaine: [medecine, pharmacologie, posologie]
+    priorite: 1
+    url: https://medicalguidelines.msf.org/fr/viewport/EssDr/francais/medicaments-essentiels-guide-pratique-d-utilisation-16682376.html
+
+  - id: who-basic-emergency-care
+    titre: "Basic Emergency Care: approach to the acutely ill and injured"
+    auteur: "OMS / WHO"
+    date: 2018
+    langue: en
+    licence: cc-by-nc-sa
+    domaine: [medecine, urgence, abcde, traumatologie]
+    priorite: 1
+    url: https://iris.who.int/bitstream/handle/10665/275635/9789241513081-eng.pdf
+
+  - id: who-water-quality
+    titre: "Guidelines for Drinking-water Quality (4e éd.)"
+    auteur: "OMS / WHO"
+    date: 2022
+    langue: en
+    licence: cc-by-nc-sa
+    domaine: [eau, potabilisation, sante]
+    priorite: 1
+    url: https://iris.who.int/bitstream/handle/10665/352532/9789240045064-eng.pdf
+
+  - id: emergency-war-surgery
+    titre: "Emergency War Surgery"
+    auteur: "Borden Institute, US Army"
+    date: 2013
+    langue: en
+    licence: public-domain
+    domaine: [medecine, chirurgie, traumatologie, hemorragie]
+    priorite: 2
+    url: https://archive.org/download/EmergencyWarSurgery2013/Emergency%20War%20Surgery%202013.pdf
+
+  - id: sof-medical-handbook
+    titre: "Special Operations Forces Medical Handbook"
+    auteur: "US Department of Defense"
+    date: 2008
+    langue: en
+    licence: public-domain
+    domaine: [medecine, milieu-isole, traumatologie]
+    priorite: 2
+    url: https://archive.org/download/SpecialOperationsForcesMedicalHandbook/SOF%20Medical%20Handbook.pdf
+
+# ═══════════════════════════════════════════════════════════════════
+# NRBC / CATASTROPHES
+# ═══════════════════════════════════════════════════════════════════
+
+  - id: nwss
+    titre: "Nuclear War Survival Skills"
+    auteur: "Cresson H. Kearny"
+    date: 1987
+    langue: en
+    licence: libre-diffusion
+    domaine: [nrbc, radioprotection, abri, eau]
+    priorite: 1
+    url: https://archive.org/download/NuclearWarSurvivalSkills/Nuclear%20War%20Survival%20Skills.pdf
+
+  - id: fema-are-you-ready
+    titre: "Are You Ready? An In-depth Guide to Citizen Preparedness"
+    auteur: "FEMA"
+    date: 2004
+    langue: en
+    licence: public-domain
+    domaine: [preparation, catastrophes, famille]
+    priorite: 2
+    url: https://www.fema.gov/pdf/areyouready/areyouready_full.pdf
+
+# ═══════════════════════════════════════════════════════════════════
+# EAU, ALIMENTATION, AUTONOMIE
+# ═══════════════════════════════════════════════════════════════════
+
+  - id: usda-home-canning
+    titre: "Complete Guide to Home Canning"
+    auteur: "USDA — National Center for Home Food Preservation"
+    date: 2015
+    langue: en
+    licence: public-domain
+    domaine: [conservation, alimentation, botulisme]
+    priorite: 1
+    url: https://nchfp.uga.edu/publications/publications_usda.html
+
+# ═══════════════════════════════════════════════════════════════════
+# BOTANIQUE & MYCOLOGIE FRANÇAISES — cœur de l'adaptation régionale
+# ═══════════════════════════════════════════════════════════════════
+
+  - id: coste-flore
+    titre: "Flore descriptive et illustrée de la France, de la Corse et des contrées limitrophes"
+    auteur: "Abbé Hippolyte Coste"
+    date: 1906
+    langue: fr
+    licence: public-domain
+    domaine: [botanique, flore, identification, france]
+    priorite: 1
+    note: >-
+      Flore de référence française tombée dans le domaine public. Nomenclature
+      ancienne : à confronter systématiquement à TAXREF pour les noms actuels.
+    url: https://archive.org/download/floredescriptive01cost/floredescriptive01cost.pdf
+
+  - id: cbnsa-flore-dordogne
+    titre: "Inventaire de la flore sauvage de Dordogne"
+    auteur: "Conservatoire Botanique National Sud-Atlantique"
+    date: 2016
+    langue: fr
+    licence: libre-acces
+    domaine: [botanique, flore, dordogne, regional]
+    priorite: 1
+    url: https://obv-na.fr/ofsa/ressources/8_docs/CBNSA_2016-Bilan_Inventaire_24_v1.0.pdf
+
+  - id: taxref
+    titre: "TAXREF — référentiel taxonomique national"
+    auteur: "INPN / Muséum national d'Histoire naturelle"
+    date: 2024
+    langue: fr
+    licence: licence-ouverte
+    domaine: [botanique, taxonomie, nomenclature]
+    priorite: 2
+    format: dataset
+    url: https://inpn.mnhn.fr/telechargement/referentielEspece/taxref/18.0/menu
+
+# ═══════════════════════════════════════════════════════════════════
+# FONDS ANCIENS — domaine public
+# ═══════════════════════════════════════════════════════════════════
+
+  - id: kings-dispensatory
+    titre: "King's American Dispensatory"
+    auteur: "Harvey Wickes Felter & John Uri Lloyd"
+    date: 1898
+    langue: en
+    licence: public-domain
+    domaine: [phytotherapie, pharmacopee, plantes-medicinales]
+    priorite: 3
+    note: >-
+      Pharmacopée du XIXe siècle. Valeur historique et ethnobotanique ; les
+      posologies NE DOIVENT PAS être suivies. Marquée priorite 3 pour cette raison.
+    url: https://archive.org/download/kingsamericandis01felt/kingsamericandis01felt.pdf
+
+  - id: grays-anatomy-1918
+    titre: "Anatomy of the Human Body (Gray's Anatomy, 20e éd.)"
+    auteur: "Henry Gray"
+    date: 1918
+    langue: en
+    licence: public-domain
+    domaine: [anatomie, medecine]
+    priorite: 3
+    url: https://www.gutenberg.org/ebooks/8942.epub.noimages
+
+# ═══════════════════════════════════════════════════════════════════
+# PACK RÉGIONAL — rédigé dans ce dépôt (voir regional/bouriane/)
+# ═══════════════════════════════════════════════════════════════════
+
+  - id: bouriane
+    titre: "Pack régional Bouriane & Périgord Noir"
+    auteur: "SURVIE — fiches locales"
+    date: 2026
+    langue: fr
+    licence: cc-by-sa
+    domaine: [regional, bouriane, lot, dordogne, eau, flore, champignons, faune, secours]
+    priorite: 1
+    format: markdown-dir
+    chemin: regional/bouriane
+
+# ═══════════════════════════════════════════════════════════════════
+# OUVRAGES SOUS DROITS — à déposer manuellement dans corpus/private/
+# Jamais téléchargés. Voir docs/CORPUS.md pour la liste d'acquisition.
+# ═══════════════════════════════════════════════════════════════════
+
+  - id: couplan-comestibles
+    titre: "Guide des plantes sauvages comestibles et toxiques"
+    auteur: "François Couplan & Eva Styner"
+    langue: fr
+    licence: copyright
+    domaine: [botanique, cueillette, toxicite, france]
+    priorite: 1
+    fichier_attendu: corpus/private/couplan-comestibles.pdf
+
+  - id: eyssartier-champignons
+    titre: "Guide des champignons — France et Europe"
+    auteur: "Guillaume Eyssartier & Pierre Roux"
+    langue: fr
+    licence: copyright
+    domaine: [mycologie, cueillette, toxicite, france]
+    priorite: 1
+    fichier_attendu: corpus/private/eyssartier-champignons.pdf
+
+  - id: auerbach-wilderness-medicine
+    titre: "Wilderness Medicine"
+    auteur: "Paul S. Auerbach"
+    langue: en
+    licence: copyright
+    domaine: [medecine, milieu-isole]
+    priorite: 1
+    fichier_attendu: corpus/private/auerbach-wilderness-medicine.pdf
+
+  - id: manise-manuel-survie
+    titre: "Manuel de survie"
+    auteur: "David Manise"
+    langue: fr
+    licence: copyright
+    domaine: [survie, france, europe]
+    priorite: 1
+    fichier_attendu: corpus/private/manise-manuel-survie.pdf
+
+  - id: wiseman-sas
+    titre: "SAS Survival Handbook"
+    auteur: "John « Lofty » Wiseman"
+    langue: en
+    licence: copyright
+    domaine: [survie]
+    priorite: 1
+    fichier_attendu: corpus/private/wiseman-sas.pdf
+
+  - id: kochanski-bushcraft
+    titre: "Bushcraft: Outdoor Skills and Wilderness Survival"
+    auteur: "Mors Kochanski"
+    langue: en
+    licence: copyright
+    domaine: [survie, feu, abri, bois]
+    priorite: 1
+    fichier_attendu: corpus/private/kochanski-bushcraft.pdf
+
+  - id: emery-country-living
+    titre: "The Encyclopedia of Country Living"
+    auteur: "Carla Emery"
+    langue: en
+    licence: copyright
+    domaine: [autonomie, alimentation, elevage, conservation]
+    priorite: 1
+    fichier_attendu: corpus/private/emery-country-living.pdf
+
+  - id: gonzales-deep-survival
+    titre: "Deep Survival: Who Lives, Who Dies, and Why"
+    auteur: "Laurence Gonzales"
+    langue: en
+    licence: copyright
+    domaine: [psychologie, decision, stress]
+    priorite: 1
+    fichier_attendu: corpus/private/gonzales-deep-survival.pdf
