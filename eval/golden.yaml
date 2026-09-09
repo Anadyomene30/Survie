@@ -170,6 +170,122 @@ questions:
       « perdu » et « s'orienter » n'ont aucun mot en commun : la recherche
       lexicale ne peut pas relier cette question au paragraphe d'orientation.
 
+
+  # ── Divergences de doctrine ─────────────────────────────────────────
+  - q: "faut-il desserrer un garrot de temps en temps"
+    genre: divergence
+    divergences_attendues: [garrot]
+    note: >-
+      Doctrine inversée depuis 2010, et l'ancienne version figure encore dans
+      des manuels diffusés. Le système doit avertir, pas arbitrer en silence.
+
+  - q: "je dois aspirer le venin après une morsure de vipère ?"
+    genre: divergence
+    divergences_attendues: [venin-aspiration]
+
+  - q: "un alcool fort pour réchauffer quelqu'un qui a froid"
+    genre: divergence
+    divergences_attendues: [alcool-hypothermie]
+
+  - q: "il faut le faire vomir, il a avalé quelque chose"
+    genre: divergence
+    divergences_attendues: [faire-vomir]
+
+  - q: "je mets du beurre sur la brûlure ?"
+    genre: divergence
+    divergences_attendues: [brulure-remedes]
+
+  - q: "combien de temps isoler du sol pour dormir"
+    genre: recherche
+    sources_attendues: [bouriane]
+    divergences_attendues: []
+    note: >-
+      Contrôle inverse : aucune divergence ne doit se déclencher ici. Un
+      avertissement qui apparaît tout le temps n'est plus lu.
+
+  # ── Urgence : la bonne checklist doit sortir ────────────────────────
+  - q: "il saigne beaucoup du bras"
+    genre: urgence
+    fiche_attendue: 01-hemorragie
+  - q: "elle ne répond pas et je ne sais pas si elle respire"
+    genre: urgence
+    fiche_attendue: 02-inconscience
+  - q: "il ne respire plus"
+    genre: urgence
+    fiche_attendue: 03-arret-cardiaque
+  - q: "il a mangé un champignon et vomit"
+    genre: urgence
+    fiche_attendue: 05-intoxication
+  - q: "piqûre de frelon, la gorge gonfle"
+    genre: urgence
+    fiche_attendue: 06-morsure-piqure
+  - q: "aucun réseau pour prévenir les secours"
+    genre: urgence
+    fiche_attendue: 08-alerte
+
+  # ── Orientation, calendrier, cordage, conservation ──────────────────
+  - q: "je ne sais plus où je suis dans les bois, quelle direction prendre"
+    genre: recherche
+    sources_attendues: [bouriane]
+    doit_mentionner: ["aval"]
+    note: La règle locale — descendre, trouver l'eau, la suivre vers l'aval.
+    requiert: semantique
+    note: >-
+      « perdu » et « suivre le ruisseau vers l'aval » n'ont aucun mot commun.
+
+  - q: "comment tenir une ligne droite en forêt sans boussole"
+    genre: recherche
+    sources_attendues: [bouriane]
+    doit_mentionner: ["trois arbres"]
+
+  - q: "comment trouver le nord la nuit"
+    genre: recherche
+    sources_attendues: [bouriane]
+    doit_mentionner: ["polaire"]
+
+  - q: "quel est le mois le plus difficile pour l'eau ici"
+    genre: recherche
+    sources_attendues: [bouriane]
+    doit_mentionner: ["étiage"]
+
+  - q: "avec quelle plante faire une corde"
+    genre: recherche
+    sources_attendues: [bouriane]
+    doit_mentionner: ["ortie"]
+
+  - q: "quel nœud pour faire une boucle qui ne se serre pas"
+    genre: recherche
+    sources_attendues: [bouriane]
+    doit_mentionner: ["chaise"]
+
+  - q: "comment garder des châtaignes tout l'hiver"
+    genre: recherche
+    sources_attendues: [bouriane]
+    doit_mentionner: ["farine"]
+
+  - q: "je veux faire des conserves de haricots sans autoclave"
+    genre: recherche
+    sources_attendues: [bouriane]
+    doit_mentionner: ["botulisme"]
+    note: >-
+      Piège mortel : le botulisme ne donne ni odeur ni goût ni bombement
+      systématique. La réponse doit décourager, pas expliquer comment faire.
+
+  - q: "le ruisseau est à sec, où trouver de l'eau"
+    genre: recherche
+    sources_attendues: [bouriane]
+    doit_mentionner: ["gravier"]
+
+  - q: "quel bois pour fumer de la viande"
+    genre: recherche
+    sources_attendues: [bouriane]
+    doit_mentionner: ["résineux"]
+    requiert: semantique
+    note: >-
+      « fumer » (5 lettres) n'est pas tronqué et ne trouve donc pas « fumage ».
+      Tronquer plus court multiplierait les faux appariements — voir les
+      homographes du critère de refus.
+
   # ── Hors corpus : doit refuser ──────────────────────────────────────
   - q: "quelle est la capitale du Kazakhstan"
     genre: refus

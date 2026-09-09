@@ -45,6 +45,8 @@ class Cas:
     pages_attendues: list[int] = field(default_factory=list)
     doit_mentionner: list[str] = field(default_factory=list)
     sosies_attendus: list[str] = field(default_factory=list)
+    divergences_attendues: list[str] | None = None
+    fiche_attendue: str = ""
     requiert: str = ""     # "semantique" : ne peut passer qu'avec un vrai embedder
     note: str = ""
 
@@ -67,6 +69,7 @@ def run(fichier: Path, db: Path, args) -> int:
 
     from .engine import Engine
     from .llm import load as load_llm
+    from . import urgence as urgence_mod
     from .prompt import format_extraits
 
     cas = _charger(fichier)
@@ -84,15 +87,35 @@ def run(fichier: Path, db: Path, args) -> int:
     reportes: list[Cas] = []
 
     echecs: list[Echec] = []
-    compte = {"recherche": 0, "refus": 0, "identification": 0}
-    reussi = {"recherche": 0, "refus": 0, "identification": 0}
+    genres = ("recherche", "refus", "identification", "divergence", "urgence")
+    compte = dict.fromkeys(genres, 0)
+    reussi = dict.fromkeys(genres, 0)
     citations_totales = citations_valides = 0
+
+    fiches_urgence = urgence_mod.charger()
 
     for c in cas:
         if c.requiert == "semantique" and not semantique:
             reportes.append(c)
             continue
         compte[c.genre] = compte.get(c.genre, 0) + 1
+
+        # Le mode urgence court-circuite le moteur : ni index, ni modèle. On le
+        # teste donc sur son propre chemin, celui qui servira réellement.
+        if c.genre == "urgence":
+            trouvees = urgence_mod.chercher(c.q, fiches_urgence)
+            obtenue = trouvees[0][0].nom if trouvees else "aucune"
+            if obtenue != c.fiche_attendue:
+                echecs.append(Echec(c, "urgence",
+                                    f"checklist « {obtenue} » au lieu de "
+                                    f"« {c.fiche_attendue} »", True))
+            else:
+                reussi["urgence"] += 1
+            if getattr(args, "verbeux", False):
+                print(f"{'ok  ' if obtenue == c.fiche_attendue else 'ÉCHEC'} "
+                      f"[urgence] {c.q}")
+            continue
+
         rep = eng.ask(c.q, k=getattr(args, "k", 8))
         ok = True
 
@@ -159,6 +182,26 @@ def run(fichier: Path, db: Path, args) -> int:
                                         "formule de prudence absente", True))
                     ok = False
 
+        # -- 1 bis. doctrines périmées --------------------------------------
+        # Contrôlé dans les DEUX sens. Ne pas avertir sur un garrot est grave ;
+        # avertir sur tout l'est aussi, parce qu'un garde-fou qui crie sans
+        # cesse cesse d'être lu.
+        if c.divergences_attendues is not None:
+            obtenues = {d.id for d in rep.divergences}
+            attendues = set(c.divergences_attendues)
+            manquantes = attendues - obtenues
+            en_trop = obtenues - attendues
+            if manquantes:
+                echecs.append(Echec(c, "divergence",
+                                    f"doctrine périmée non signalée : "
+                                    f"{sorted(manquantes)}", True))
+                ok = False
+            if en_trop:
+                echecs.append(Echec(c, "divergence",
+                                    f"avertissement hors sujet : {sorted(en_trop)}",
+                                    False))
+                ok = False
+
         # -- 2. citations ---------------------------------------------------
         if avec_modele and rep.rapport:
             citations_totales += rep.rapport.citations
@@ -183,7 +226,7 @@ def run(fichier: Path, db: Path, args) -> int:
     print(f"ÉVALUATION — {len(cas)} cas, modèle : {eng.llm.name}")
     print(f"index : {eng.store.embed_model}")
     print("═" * 70)
-    for genre in ("recherche", "refus", "identification"):
+    for genre in genres:
         if compte.get(genre):
             n, t = reussi.get(genre, 0), compte[genre]
             print(f"  {genre:<16} {n:3}/{t:<3} {100 * n / t:5.1f} %")

@@ -26,6 +26,24 @@ RRF_K = 60
 CANDIDATS = 50   # par méthode, avant fusion
 RETENUS = 8      # transmis au modèle
 
+# Sièges garantis : les N premiers de CHAQUE méthode entrent dans le résultat
+# final, même si la fusion les classe mal.
+#
+# La fusion RRF récompense l'accord entre méthodes, et c'est ce qu'on veut la
+# plupart du temps. Mais elle sacrifie l'excellence dans une seule : un passage
+# premier en plein texte et absent du classement vectoriel ne reçoit qu'une
+# contribution, et se fait battre par des passages médiocres dans les deux, qui
+# en cumulent deux.
+#
+# Mesuré : sur « quelle méthode pour rendre l'eau potable », la section
+# « Traitement » — qui contient la réponse — sortait RANG 2 en BM25 et
+# n'apparaissait pas dans les huit extraits transmis.
+#
+# En survie, un terme exact est souvent décisif : « ébullition »,
+# « Cortinarius orellanus », « 114 ». On ne peut pas se permettre de perdre le
+# meilleur résultat lexical au profit d'un consensus tiède.
+SIEGES_GARANTIS = 2
+
 # Mots vides français + interrogatifs : ils font remonter n'importe quoi en BM25.
 STOPWORDS = {
     "le", "la", "les", "un", "une", "des", "du", "de", "d", "et", "ou", "a", "à",
@@ -217,9 +235,31 @@ def search(store: Store, query: str, qvec: np.ndarray | None = None,
         rangs[rid][1] = i
 
     passages = store.passages(list(scores))
-    hits = [
-        Hit(p, scores[rid] * _boost(p), rangs[rid][0], rangs[rid][1])
+    par_rowid: dict[int, Hit] = {
+        rid: Hit(p, scores[rid] * _boost(p), rangs[rid][0], rangs[rid][1])
         for rid, p in passages.items()
-    ]
-    hits.sort(key=lambda h: -h.score)
-    return hits[:k]
+    }
+    classe = sorted(par_rowid.items(), key=lambda kv: -kv[1].score)
+
+    garantis = lex[:SIEGES_GARANTIS] + vec[:SIEGES_GARANTIS]
+    return _avec_sieges(classe, garantis, k)
+
+
+def _avec_sieges(classe: list[tuple[int, Hit]], garantis: list[int],
+                 k: int) -> list[Hit]:
+    """Complète le classement fusionné avec les têtes de chaque méthode.
+
+    Les garantis conservent leur score de fusion : ils obtiennent une place
+    assurée, pas la première. Le classement reste celui du RRF.
+    """
+    retenus = classe[:k]
+    presents = {rid for rid, _ in retenus}
+    manquants = [(rid, par) for rid, par in classe
+                 if rid in garantis and rid not in presents]
+    if not manquants:
+        return [h for _, h in retenus]
+    # On évince les derniers du classement fusionné, jamais les premiers.
+    garde = retenus[:max(0, k - len(manquants))]
+    fusion = garde + manquants[:k]
+    fusion.sort(key=lambda kv: -kv[1].score)
+    return [h for _, h in fusion[:k]]

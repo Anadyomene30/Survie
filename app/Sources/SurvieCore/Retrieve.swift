@@ -16,6 +16,20 @@ public enum Retrieve {
     public static let candidats = 50
     public static let retenus = 8
 
+    /// Sièges garantis : les N premiers de CHAQUE méthode entrent dans le
+    /// résultat final, même si la fusion les classe mal.
+    ///
+    /// La fusion RRF récompense l'accord entre méthodes, et sacrifie
+    /// l'excellence dans une seule : un passage premier en plein texte mais
+    /// absent du classement vectoriel ne reçoit qu'une contribution, et se fait
+    /// battre par des passages médiocres dans les deux, qui en cumulent deux.
+    ///
+    /// Mesuré côté Python : la section contenant « ébullition » sortait rang 2
+    /// en BM25 et n'apparaissait pas dans les huit extraits transmis. En survie
+    /// un terme exact est souvent décisif — « ébullition », « 114 » — et le
+    /// perdre au profit d'un consensus tiède n'est pas acceptable.
+    public static let siegesGarantis = 2
+
     /// Mots vides français et interrogatifs : ils font remonter n'importe quoi en BM25.
     static let motsVides: Set<String> = [
         "le", "la", "les", "un", "une", "des", "du", "de", "d", "et", "ou", "a", "à",
@@ -172,13 +186,32 @@ public enum Retrieve {
         }
 
         let passages = try store.passages(rowids: Array(scores.keys))
-        return passages.compactMap { rid, p -> Hit? in
+        let classe = passages.compactMap { rid, p -> (Int, Hit)? in
             guard let s = scores[rid] else { return nil }
-            return Hit(passage: p, score: s * ponderation(p),
-                       rangLexical: rangs[rid]?.0, rangVectoriel: rangs[rid]?.1)
+            return (rid, Hit(passage: p, score: s * ponderation(p),
+                             rangLexical: rangs[rid]?.0, rangVectoriel: rangs[rid]?.1))
         }
-        .sorted { $0.score > $1.score }
-        .prefix(k)
-        .map { $0 }
+        .sorted { $0.1.score > $1.1.score }
+
+        let garantis = Set(lex.prefix(siegesGarantis) + vec.prefix(siegesGarantis))
+        return avecSieges(classe, garantis: garantis, k: k)
+    }
+
+    /// Complète le classement fusionné avec les têtes de chaque méthode.
+    ///
+    /// Les garantis conservent leur score de fusion : ils obtiennent une place
+    /// assurée, pas la première. Le classement reste celui du RRF.
+    static func avecSieges(_ classe: [(Int, Hit)], garantis: Set<Int>,
+                           k: Int) -> [Hit] {
+        let retenus = Array(classe.prefix(k))
+        let presents = Set(retenus.map(\.0))
+        let manquants = classe.filter { garantis.contains($0.0) && !presents.contains($0.0) }
+        guard !manquants.isEmpty else { return retenus.map(\.1) }
+        // On évince les derniers du classement fusionné, jamais les premiers.
+        let garde = Array(retenus.prefix(max(0, k - manquants.count)))
+        return (garde + manquants)
+            .sorted { $0.1.score > $1.1.score }
+            .prefix(k)
+            .map(\.1)
     }
 }

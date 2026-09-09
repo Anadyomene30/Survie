@@ -183,3 +183,32 @@ def test_refus_est_un_filtre_rapide_pas_une_garantie(engine):
                      "il ne frissonne plus et devient somnolent",
                      "hypothermie vêtements mouillés"]:
         assert not engine.ask(question).refus, f"faux refus : {question}"
+
+
+def test_sieges_garantis_pour_le_meilleur_lexical(engine):
+    """Le meilleur résultat plein texte ne doit jamais être perdu par la fusion.
+
+    Régression mesurée : sur « quelle méthode pour rendre l'eau potable », la
+    section contenant « ébullition » sortait RANG 2 en BM25 et n'apparaissait
+    pourtant pas dans les extraits transmis. La fusion RRF récompense l'accord
+    entre méthodes et sacrifie l'excellence dans une seule : des passages
+    médiocres dans les deux, cumulant deux contributions, la dépassaient.
+
+    En survie, un terme exact est souvent décisif — « ébullition »,
+    « Cortinarius orellanus », « 114 ». Le perdre au profit d'un consensus
+    tiède n'est pas acceptable.
+    """
+    from survie import retrieve
+    from survie.retrieve import SIEGES_GARANTIS
+
+    question = "comment rendre l'eau potable"
+    qvec = engine.embedder.encode([question], is_query=True)[0]
+    meilleurs_lex = retrieve._lexical(engine.store, question, retrieve.CANDIDATS)
+    assert meilleurs_lex, "aucun résultat plein texte"
+
+    retenus = {h.passage.chunk_id for h in engine.ask(question).hits}
+    attendus = engine.store.passages(meilleurs_lex[:SIEGES_GARANTIS])
+    for p in attendus.values():
+        assert p.chunk_id in retenus, (
+            f"{p.chunk_id}, tête du classement plein texte, a été évincé"
+        )
