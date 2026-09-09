@@ -38,6 +38,11 @@ Trois garde-fous, dans cet ordre de gravité :
 
 ## Démarrage
 
+> **Première fois sur le Mac ?** Suis [`docs/DEMARRAGE-MAC.md`](docs/DEMARRAGE-MAC.md) :
+> commandes exactes, sorties attendues, et les deux points qu'il faut valider
+> avant de construire quoi que ce soit.
+
+
 ```bash
 make setup           # dépendances (uv)
 make corpus-check    # vérifie que les URLs du manifeste répondent
