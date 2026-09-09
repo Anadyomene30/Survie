@@ -29,6 +29,7 @@ def _engine(args):
 
 
 def cmd_ask(args) -> int:
+    from .divergence import rendu_humain
     from .validate import annoter
 
     eng = _engine(args)
@@ -42,6 +43,11 @@ def cmd_ask(args) -> int:
                   f"cosinus max {sig.cos_max:.3f}, {sig.n_lexical} passages "
                   f"contenant un terme de la question)")
         return 0
+
+    # Affiché AVANT la réponse : un avertissement qu'il faut faire défiler
+    # pour découvrir ne sert à rien dans l'urgence.
+    if rep.divergences:
+        print(rendu_humain(rep.divergences))
 
     if rep.texte:
         print(annoter(rep.texte, rep.rapport) if rep.rapport else rep.texte)
@@ -65,11 +71,41 @@ def cmd_ask(args) -> int:
         if p.image:
             print(f"   page : build/pages/{p.image}")
 
+    if rep.ecart_dates:
+        print(f"\n  Sources publiées entre {rep.ecart_dates[0]} et "
+              f"{rep.ecart_dates[1]} : vérifie les dates sur les points médicaux.")
+
     if rep.identification:
         print("\n" + "─" * 70)
         print("Question d'identification : le système ne conclut jamais qu'une")
         print("espèce est comestible. Vérifie les critères ci-dessus contre une")
         print("flore, et dans le doute, abstiens-toi.")
+    return 0
+
+
+def cmd_urgence(args) -> int:
+    """Chemin le plus court du système : aucun index, aucun modèle, aucun réseau.
+
+    Volontairement indépendant du reste : il doit répondre même si la base est
+    absente ou corrompue.
+    """
+    from .urgence import charger, chercher, rendu, sommaire
+
+    fiches = charger()
+    if not args.sujet:
+        print(sommaire(fiches))
+        return 0
+
+    trouvees = chercher(" ".join(args.sujet), fiches)
+    if not trouvees:
+        print(f"Aucune checklist ne correspond à « {' '.join(args.sujet)} ».\n")
+        print(sommaire(fiches))
+        return 1
+
+    print(rendu(trouvees[0][0]))
+    if len(trouvees) > 1:
+        autres = ", ".join(f.nom for f, _ in trouvees[1:4])
+        print(f"Voir aussi : {autres}")
     return 0
 
 
@@ -138,6 +174,10 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("question")
     p.add_argument("-k", type=int, default=8)
     p.set_defaults(func=cmd_search)
+
+    p = sub.add_parser("urgence", help="checklist d'urgence — sans modèle, instantané")
+    p.add_argument("sujet", nargs="*", help="mot-clé ; sans argument, liste les fiches")
+    p.set_defaults(func=cmd_urgence)
 
     p = sub.add_parser("info", help="état de l'index")
     p.set_defaults(func=cmd_info)

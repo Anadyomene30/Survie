@@ -112,8 +112,14 @@ def format_extraits(hits: list[Hit]) -> str:
     return "\n\n---\n\n".join(blocs)
 
 
-def build(question: str, hits: list[Hit]) -> tuple[str, str]:
-    """Renvoie (message système, message utilisateur)."""
+def build(question: str, hits: list[Hit], encart: str = "") -> tuple[str, str]:
+    """Renvoie (message système, message utilisateur).
+
+    `encart` porte l'avertissement sur les doctrines ayant changé. Il est placé
+    AVANT les extraits et non après : ce qui suit doit être lu à sa lumière, et
+    un avertissement relégué en fin d'invite pèse moins qu'un texte de manuel
+    bien tourné.
+    """
     systeme = SYSTEME
     if is_identification(question):
         systeme += (
@@ -121,8 +127,9 @@ def build(question: str, hits: list[Hit]) -> tuple[str, str]:
             "La règle de sûreté ci-dessus s'applique impérativement.\n"
         )
 
+    tete = f"{encart}\n\n{'=' * 60}\n\n" if encart else ""
     utilisateur = (
-        f"EXTRAITS DISPONIBLES\n\n{format_extraits(hits)}\n\n"
+        f"{tete}EXTRAITS DISPONIBLES\n\n{format_extraits(hits)}\n\n"
         f"{'=' * 60}\n\nQUESTION : {question}\n\n"
         "Réponds uniquement à partir des extraits ci-dessus, en citant "
         "[identifiant p.numéro] après chaque affirmation."

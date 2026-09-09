@@ -160,3 +160,26 @@ def test_pas_de_socket_reseau(engine):
         engine.ask("comment traiter l'eau d'une source")
     finally:
         socket.socket = original  # type: ignore[misc]
+
+
+def test_refus_est_un_filtre_rapide_pas_une_garantie(engine):
+    """Documente une limite assumée, pour qu'on ne la « corrige » pas à tort.
+
+    Le refus lexical attrape le grossier. Il laisse passer les homographes —
+    « capitale du Kazakhstan » quand le corpus contient « l'heure est capitale »,
+    « soufflé au fromage » quand il contient « le souffle sur la joue ». C'est
+    structurel : la forme ne dit rien du sens.
+
+    Le réflexe serait de durcir le seuil. Ce serait une erreur : cela
+    provoquerait des faux refus, qui privent d'aide quelqu'un dont la question
+    EST couverte — l'erreur la plus grave des deux. Le vrai garde-fou est en
+    aval : le modèle, en mode RAG strict, refuse de lui-même sur des extraits
+    hors sujet, et lui ne se dégrade pas avec la taille du corpus.
+
+    Ce test verrouille donc le comportement voulu : aucun faux refus sur des
+    questions couvertes, quitte à laisser passer des questions qui ne le sont pas.
+    """
+    for question in ["comment rendre l'eau potable",
+                     "il ne frissonne plus et devient somnolent",
+                     "hypothermie vêtements mouillés"]:
+        assert not engine.ask(question).refus, f"faux refus : {question}"

@@ -1,0 +1,150 @@
+# Registre des doctrines qui ont changé.
+#
+# Pourquoi ce fichier existe. L'invite système ordonne au modèle d'exposer les
+# sources qui divergent, mais une consigne ne se vérifie pas : le modèle peut
+# trancher silencieusement en faveur du passage le mieux écrit, qui est souvent
+# le plus ancien. Or le corpus contient délibérément des manuels de 1957, 1987
+# ou 1998, encore excellents sur le feu, l'abri ou la navigation, et périmés —
+# parfois dangereusement — sur certains gestes de secours.
+#
+# La détection automatique de contradiction entre deux textes (inférence
+# textuelle) est peu fiable et échouerait sans le dire. On prend donc la voie
+# inverse : un registre curé, explicite et vérifiable, des cas connus.
+#
+# Champs :
+#   sujet    — termes déclencheurs, comparés à la question ET aux extraits
+#   ancienne — la doctrine périmée, telle qu'elle est encore imprimée
+#   actuelle — la doctrine en vigueur
+#   bascule  — année approximative du changement
+#   gravite  — critique (peut tuer) | importante | mineure
+#   source   — d'où vient la doctrine actuelle
+
+version: 1
+
+divergences:
+
+  - id: garrot
+    titre: "Pose et desserrage du garrot"
+    sujet: [garrot, tourniquet, hémorragie, saignement abondant, amputation,
+            membre sectionné, sang qui gicle]
+    ancienne: >-
+      Le garrot est un geste de dernier recours, dangereux pour le membre, qu'il
+      faut desserrer périodiquement pour « laisser passer le sang ».
+    actuelle: >-
+      Le garrot est posé sans délai sur une hémorragie de membre non contrôlable
+      par compression directe. Une fois posé, il n'est JAMAIS desserré : le
+      desserrage relance l'hémorragie et provoque un relargage toxique. On note
+      l'heure de pose, et seule l'équipe médicale le retire.
+    bascule: 2010
+    gravite: critique
+    source: >-
+      Recommandations issues de la médecine de guerre (TCCC), reprises par les
+      référentiels civils de secourisme.
+
+  - id: venin-aspiration
+    titre: "Aspiration et incision d'une morsure de serpent"
+    sujet: [morsure, serpent, vipère, venin, aspiration, incision, succion, aspivenin]
+    ancienne: >-
+      Inciser la plaie et aspirer le venin, à la bouche ou avec une pompe
+      aspirante. Poser un garrot en amont pour bloquer la diffusion.
+    actuelle: >-
+      Ni incision, ni succion, ni pompe aspirante : ces gestes sont inefficaces
+      et aggravent les lésions locales et le risque infectieux. Pas de garrot.
+      On immobilise le membre en position basse, on retire bagues et bracelets
+      avant l'œdème, on allonge et on rassure la victime, et on appelle le 15.
+    bascule: 2000
+    gravite: critique
+    source: Sociétés de toxicologie clinique ; recommandations françaises actuelles.
+
+  - id: alcool-hypothermie
+    titre: "Alcool en cas d'hypothermie"
+    sujet: [hypothermie, alcool, gelure, coup de froid, rechauffer la victime]
+    ancienne: >-
+      Donner un alcool fort pour « réchauffer » la victime — l'image du
+      saint-bernard et de son tonnelet de rhum.
+    actuelle: >-
+      Jamais d'alcool. La vasodilatation périphérique qu'il provoque donne une
+      sensation de chaleur tout en accélérant la déperdition thermique réelle,
+      et il altère le jugement d'une personne déjà confuse.
+    bascule: 1980
+    gravite: critique
+    source: Consensus en médecine de montagne et de milieu isolé.
+
+  - id: faire-vomir
+    titre: "Faire vomir après une ingestion toxique"
+    sujet: [intoxication, empoisonnement, faire vomir, vomissement, a avalé,
+            ingestion toxique, a mangé un champignon]
+    ancienne: >-
+      Faire vomir la victime pour évacuer le toxique, éventuellement avec de
+      l'eau salée ou du sirop d'ipéca. Donner du lait comme « antidote ».
+    actuelle: >-
+      Ne jamais faire vomir : risque d'inhalation, et second passage du produit
+      sur l'œsophage, aggravant pour les caustiques. Pas de lait, qui accélère
+      l'absorption de certains toxiques. On appelle le 15, on conserve
+      l'emballage ou un échantillon, et on note l'heure d'ingestion.
+    bascule: 2005
+    gravite: critique
+    source: Centres antipoison ; abandon de l'ipéca dans les recommandations.
+
+  - id: rcp-insufflations
+    titre: "Insufflations lors d'une réanimation cardio-pulmonaire"
+    sujet: [réanimation, rcp, massage cardiaque, arrêt cardiaque, bouche-à-bouche, insufflation, compression]
+    ancienne: >-
+      Alterner systématiquement compressions et insufflations, y compris pour un
+      sauveteur non formé, selon un rythme précis à mémoriser.
+    actuelle: >-
+      Pour un témoin non formé ou peu entraîné, la réanimation par compressions
+      thoraciques seules est recommandée, sans interruption. L'essentiel est de
+      commencer immédiatement, de comprimer fort et vite, et de ne pas s'arrêter.
+      Les insufflations restent indiquées pour les sauveteurs formés, et chez
+      l'enfant et le noyé, où la cause est respiratoire.
+    bascule: 2010
+    gravite: critique
+    source: Recommandations ERC / ILCOR.
+
+  - id: brulure-remedes
+    titre: "Remèdes traditionnels sur une brûlure"
+    sujet: [brûlure, brulure, ébouillanté, échaudé, brûlé]
+    ancienne: >-
+      Appliquer du beurre, de l'huile, du dentifrice ou de la farine sur une
+      brûlure. Percer les cloques.
+    actuelle: >-
+      Refroidir à l'eau tempérée qui ruisselle, sans excès pour ne pas provoquer
+      d'hypothermie sur les grandes surfaces. Rien d'autre sur la peau : ni corps
+      gras, ni farine, qui retiennent la chaleur et gênent l'examen médical. Ne
+      pas percer les cloques, retirer bagues et vêtements non adhérents.
+    bascule: 1990
+    gravite: importante
+    source: Référentiels de secourisme.
+
+  - id: eau-javel-cryptosporidium
+    titre: "Portée réelle de la désinfection chimique de l'eau"
+    sujet: [potabilisation, javel, chlore, désinfection de l'eau, purifier l'eau,
+            giardia, cryptosporidium, rendre l'eau potable]
+    ancienne: >-
+      Quelques gouttes d'eau de Javel ou un comprimé désinfectant rendent
+      n'importe quelle eau potable.
+    actuelle: >-
+      La désinfection chimique agit sur les bactéries et les virus, mais reste
+      peu fiable sur les kystes de Cryptosporidium et imparfaite sur Giardia.
+      En eau froide ou trouble, il faut allonger le temps de contact et doubler
+      la dose. La filtration mécanique retient les protozoaires mais pas les
+      virus. L'ébullition, elle, traite les trois.
+    bascule: 2000
+    gravite: importante
+    source: OMS, Guidelines for Drinking-water Quality ; CDC.
+
+  - id: hyperventilation-apnee
+    titre: "Hyperventilation avant une apnée"
+    sujet: [apnée, hyperventilation, retenir son souffle, plongée en apnée]
+    ancienne: >-
+      Hyperventiler avant une apnée pour « faire le plein d'oxygène » et tenir
+      plus longtemps.
+    actuelle: >-
+      L'hyperventilation n'augmente pas la réserve d'oxygène : elle abaisse le
+      gaz carbonique, donc supprime l'envie de respirer qui sert de signal
+      d'alarme. Elle provoque des syncopes en fin d'apnée, cause fréquente de
+      noyade chez des nageurs expérimentés.
+    bascule: 1990
+    gravite: critique
+    source: Médecine de la plongée.

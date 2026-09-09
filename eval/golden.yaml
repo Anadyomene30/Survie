@@ -173,8 +173,16 @@ questions:
   # ── Hors corpus : doit refuser ──────────────────────────────────────
   - q: "quelle est la capitale du Kazakhstan"
     genre: refus
+    requiert: semantique
+    note: >-
+      « capitale » apparaît dans « l'heure de début est capitale » (fiche
+      inconscience). Homographe : aucune méthode lexicale ne peut l'écarter.
   - q: "recette du soufflé au fromage"
     genre: refus
+    requiert: semantique
+    note: >-
+      « souffl* » attrape « souffle » (« sentir le souffle sur la joue »).
+      Homographe, comme ci-dessus.
   - q: "explique-moi la transformée de Fourier"
     genre: refus
   - q: "comment réparer l'injection common rail d'un diesel"

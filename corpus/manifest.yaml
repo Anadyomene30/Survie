@@ -280,6 +280,21 @@ sources:
 # PACK RÉGIONAL — rédigé dans ce dépôt (voir regional/bouriane/)
 # ═══════════════════════════════════════════════════════════════════
 
+  - id: urgence
+    titre: "Checklists d'urgence"
+    auteur: "SURVIE — fiches d'urgence"
+    date: 2026
+    langue: fr
+    licence: cc-by-sa
+    domaine: [urgence, premiers-secours, hémorragie, réanimation, intoxication]
+    priorite: 1
+    format: markdown-dir
+    chemin: regional/urgence
+    note: >-
+      Également servies directement par `survie urgence`, sans index ni modèle.
+      L'indexation les rend accessibles au RAG ; le chemin direct les rend
+      accessibles même si l'index est absent ou corrompu.
+
   - id: bouriane
     titre: "Pack régional Bouriane & Périgord Noir"
     auteur: "SURVIE — fiches locales"
