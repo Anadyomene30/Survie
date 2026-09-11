@@ -38,6 +38,9 @@ Trois garde-fous, dans cet ordre de gravité :
 
 ## Démarrage
 
+> **Tu reprends le projet en local ?** Commence par
+> [`docs/REPRENDRE-EN-LOCAL.md`](docs/REPRENDRE-EN-LOCAL.md).
+>
 > **Première fois sur le Mac ?** Suis [`docs/DEMARRAGE-MAC.md`](docs/DEMARRAGE-MAC.md) :
 > commandes exactes, sorties attendues, et les deux points qu'il faut valider
 > avant de construire quoi que ce soit.
