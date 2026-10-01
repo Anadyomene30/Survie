@@ -57,8 +57,9 @@ recherche tourne, les passages sont restitués tels quels, rien n'est reformulé
 C'est le mode le plus sûr de tous.
 
 ```bash
-make test            # 26 tests, sans réseau ni dépendance lourde
+make test            # 71 tests, sans réseau ni dépendance lourde
 make eval            # jeu d'évaluation (sûreté, citations, refus, recherche)
+make parite          # les moteurs Python et Swift donnent-ils les mêmes extraits ?
 ```
 
 ## Choix du modèle
@@ -73,6 +74,22 @@ make eval            # jeu d'évaluation (sûreté, citations, refus, recherche)
 survie ask --modele rapide "..."
 ```
 
+Le modèle d'**embeddings**, lui, n'est pas un choix de confort : il fige
+l'index. Validé sur ce Mac (`scripts/valider-embedder.py`) :
+
+```bash
+SURVIE_EMBEDDER=mlx
+SURVIE_EMBED_MODEL=mlx-community/bge-m3-mlx-fp16   # défaut du backend mlx
+```
+
+`BAAI/bge-m3` ne publie pas de safetensors et ne peut donc pas être chargé par
+MLX ; la conversion MLX du même modèle, si. Et ce n'est pas un détail de
+plomberie : sur une phrase témoin, les deux rendent des vecteurs à **cosinus
+0,78**. Même nom, même dimension, vecteurs incomparables. L'index consigne donc
+le nom, le backend **et** le vecteur d'une phrase témoin, que tout moteur
+ré-encode au démarrage — Python comme Swift. En dessous de 0,99, il refuse de
+servir plutôt que de rendre du bruit.
+
 Le mode `batterie` n'est pas un gadget : quand il reste 20 % de batterie et
 aucune prise à moins de trois heures de marche, la question n'est plus la
 qualité de la prose.
@@ -86,14 +103,21 @@ ingest/     Python — pipeline exécuté UNE fois, jamais livré
 cli/        moteur de référence + CLI (Python) — sert à l'évaluation
 app/        SurvieCore (Swift) + application en barre de menus
 corpus/     manifest.yaml ; public/ téléchargé ; private/ jamais versionné
-regional/   pack Bouriane & Périgord Noir (8 fiches)
-eval/       golden.yaml — 31 cas
+regional/   pack Bouriane & Périgord Noir (13 fiches) + 9 fiches d'urgence
+eval/       golden.yaml — 53 cas
 ```
 
 Le moteur existe en deux implémentations : **Python** (référence, itération
 rapide, évaluation) et **Swift** (runtime de l'application). Elles doivent
 donner les mêmes extraits sur `eval/golden.yaml` — c'est la condition qui
 autorise à mettre au point la recherche en Python.
+
+Cette condition est **vérifiée mécaniquement** : `make parite` interroge les
+deux moteurs sur les 53 questions du jeu d'évaluation et compare citation par
+citation, rang par rang, score par score. Sans cela, l'évaluation décrirait un
+prototype que personne n'utilise. Le comparatif porte sur la recherche plein
+texte : le classement vectoriel ne pourra être comparé qu'une fois MLX branché
+des deux côtés, avec le même modèle.
 
 ### Décisions notables
 
@@ -141,10 +165,17 @@ réponses ici. C'est précisément ce que le pack corrige.
 
 ## Corpus
 
-- **Sources libres** (24) — téléchargées automatiquement : manuels de survie du
-  domaine public, guides médicaux Hesperian et **MSF en français**, OMS,
-  *Nuclear War Survival Skills*, **Flore de Coste** (1906, domaine public),
-  inventaire flore Dordogne du CBNSA.
+- **Sources libres** (24 déclarées, **18 accessibles** au 11 septembre 2026) —
+  téléchargées automatiquement : manuels de survie du domaine public (FM 21-76,
+  FM 3-05.70, MCRP 3-02H, Ranger Handbook), médecine de terrain (*Emergency War
+  Surgery* 2018, *SOF Medical Handbook*, OMS), *Nuclear War Survival Skills*,
+  **Flore de Coste** (1906) et *King's American Dispensatory* (1898), inventaire
+  flore Dordogne du CBNSA.
+  Six sources restent introuvables : les trois guides **Hesperian** (site en
+  panne), les deux guides **MSF en français** (passés en application web) et le
+  guide de conserves **USDA**. Ce sont les manques les plus sensibles — MSF est
+  la seule médecine de terrain en français du corpus. Détail et méthode de
+  réparation dans [`docs/DEMARRAGE-MAC.md`](docs/DEMARRAGE-MAC.md).
 - **Ouvrages sous droits** (8 déclarés, extensibles) — **jamais téléchargés**.
   À se procurer légalement et à déposer dans `corpus/private/`.
 - **Wikipédia FR hors ligne** (archive Kiwix) — ingérée **sélectivement** par
@@ -167,23 +198,35 @@ jamais d'œuvre sous droits ni d'index dérivé.
 | Composant | État |
 |---|---|
 | Pipeline d'ingestion | fonctionnel, testé de bout en bout |
-| Moteur RAG + CLI (Python) | fonctionnel, 26 tests, éval 29/29 |
-| Pack régional Bouriane | 8 fiches rédigées |
-| Jeu d'évaluation | 31 cas |
-| `SurvieCore` (Swift) | écrit, **non compilé** — à valider sur le Mac |
-| Application menu bar | à écrire (voir `app/Sources/SurvieApp/README.md`) |
+| Moteur RAG + CLI (Python) | fonctionnel, 71 tests, éval 47/47 exécutables |
+| Pack régional Bouriane | 13 fiches + 9 fiches d'urgence |
+| Jeu d'évaluation | 53 cas |
+| `SurvieCore` (Swift) | **compile et passe ses 19 tests** (Swift 6.3, macOS 26) |
+| Parité Python ↔ Swift | **53/53**, recherche plein texte (`make parite`) |
+| Application menu bar | écrite, compile — **jamais lancée** |
+| Index de production | à construire : ni corpus téléchargé, ni modèle validé |
 
-Le code Swift a été écrit sur une machine Linux et n'a donc **jamais été
-compilé**. Attends-toi à des corrections au premier `swift build`.
+Le code Swift avait été écrit sans toolchain Swift ; il a été compilé pour la
+première fois le 11 septembre 2026 sur M1 Pro, au prix d'une seule correction
+(un `? :` dont les deux branches n'avaient pas le même type).
+
+Ce qui reste à faire, dans l'ordre : valider le modèle d'embeddings
+(`scripts/valider-embedder.py`), corriger le manifeste d'après `make
+corpus-check`, construire l'index réel, puis lancer l'application.
 
 ## Limites connues
 
 - **La qualité de l'OCR plafonne tout le système.** Les guides botaniques
   scannés sont les plus fragiles (noms latins, tableaux). `make ingest` signale
   les pages douteuses ; préfère un EPUB ou un PDF texte natif quand tu as le choix.
-- **Deux cas d'évaluation exigent le modèle sémantique** et ne peuvent pas
+- **Six cas d'évaluation exigent le modèle sémantique** et ne peuvent pas
   passer avec le backend de test. Ils sont déclarés comme tels plutôt que
   masqués.
+- **La parité vérifiée ne couvre pas le classement vectoriel.** Les deux
+  moteurs sont comparés sans vecteurs, faute d'un embedder commun : côté
+  Python le repli « hashing » existe, côté Swift l'embedder vient de MLX ou
+  n'existe pas. Tout ce qui a été porté à la main d'un langage à l'autre est
+  couvert ; la recherche vectorielle reste à confronter.
 - **L'identification par photo est hors périmètre.** Techniquement faisable via
   Core ML, mais rendre un verdict visuel sur une plante est exactement le type
   de fonctionnalité qui tue quelqu'un.

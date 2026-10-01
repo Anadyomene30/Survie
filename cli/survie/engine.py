@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -48,6 +49,33 @@ SEUIL_COUVERTURE = 0.20
 SEUIL_COSINUS = 0.60      # similarité sémantique maximale jugée probante
 
 
+def charger_embedder(sans_vecteurs: bool = False):
+    """Embedder de requête, ou None si aucun backend utilisable n'est présent.
+
+    Aucune raison de s'arrêter là : sans vecteurs la recherche reste plein
+    texte, dégradée mais utilisable — et c'est exactement le mode dans lequel
+    tourne une machine sans MLX. Le refuser ferait échouer `survie ask` et
+    `make eval` sur une installation partielle, au lieu de rendre ce qu'on peut.
+
+    On attrape plus large qu'ImportError : une bibliothèque installée mais
+    incompatible avec la version de son moteur lève autre chose (vu ici :
+    `AttributeError` à l'import de mlx_lm). Du point de vue de l'utilisateur
+    c'est la même panne — le backend n'est pas utilisable — et la conduite à
+    tenir est la même.
+    """
+    if sans_vecteurs:
+        return None
+    from ingest.embed import get_embedder
+
+    try:
+        return get_embedder()
+    except Exception as e:
+        print(f"  aucun backend d'embeddings ({e}) : recherche plein texte seule, "
+              "sans reformulation sémantique.\n"
+              "  Sur Mac : uv sync --extra mlx", file=sys.stderr)
+        return None
+
+
 @dataclass
 class Reponse:
     question: str
@@ -71,8 +99,13 @@ class Engine:
         self.registre = registre if registre is not None else divergence_mod.charger()
         if embedder is not None:
             # Refuse tôt un index construit avec un autre modèle : les résultats
-            # seraient du bruit, sans le moindre signal d'erreur.
-            self.store.check_embedder(embedder.name)
+            # seraient du bruit, sans le moindre signal d'erreur. Le nom et le
+            # backend sont des déclarations ; le témoin est une mesure.
+            self.store.check_embedder(embedder.name,
+                                      getattr(embedder, "backend", None))
+            from ingest.embed import PHRASE_TEMOIN
+
+            self.store.check_temoin(embedder.encode([PHRASE_TEMOIN])[0])
 
     def _qvec(self, question: str) -> np.ndarray | None:
         if self.embedder is None:

@@ -126,4 +126,36 @@ final class PariteTests: XCTestCase {
         XCTAssertEqual(Urgence.chercher("il fait froid et il ne respire pas",
                                         dans: fiches).first?.nom, "b")
     }
+
+    // MARK: - Règle d'or d'identification
+
+    /// Mêmes cas que tests/test_identification.py. L'asymétrie des erreurs est
+    /// totale ici : sur-déclencher ajoute un avertissement inutile,
+    /// sous-déclencher laisse sans garde-fou la question de quelqu'un qui tient
+    /// un champignon dans la main.
+    func testIdentificationDeclenche() {
+        for q in ["ce champignon est-il comestible",
+                  "comment garder des châtaignes tout l'hiver",
+                  "j'ai ramassé des amanites ce matin",
+                  "ces bolets poussent sous les chênes",
+                  "des sureaux au bord du chemin",
+                  "des fougères plein le sous-bois",
+                  "un if dans le cimetière du village",
+                  "une œnanthe safranée près du ruisseau",
+                  "une oenanthe safranée près du ruisseau",
+                  "châtaigne ou marron, comment les distinguer"] {
+            XCTAssertTrue(Prompt.estIdentification(q), q)
+        }
+    }
+
+    func testIdentificationNeDeclenchePas() {
+        for q in ["comment faire un feu sous la pluie",
+                  "quelle direction prendre pour rejoindre une route",
+                  // « cependant » commence par « cèpe » plié : sans ancrage en
+                  // tête de mot, la moitié des questions déclencheraient.
+                  "cependant il pleut, où s'abriter",
+                  "je préfère marcher de nuit"] {
+            XCTAssertFalse(Prompt.estIdentification(q), q)
+        }
+    }
 }

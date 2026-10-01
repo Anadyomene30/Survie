@@ -19,13 +19,11 @@ DB = ROOT / "build" / "survie.db"
 
 
 def _engine(args):
-    from ingest.embed import get_embedder
-
-    from .engine import Engine
+    from .engine import Engine, charger_embedder
     from .llm import load as load_llm
 
-    embedder = None if args.sans_vecteurs else get_embedder()
-    return Engine(Path(args.db), load_llm(args.modele), embedder)
+    return Engine(Path(args.db), load_llm(args.modele),
+                  charger_embedder(args.sans_vecteurs))
 
 
 def cmd_ask(args) -> int:

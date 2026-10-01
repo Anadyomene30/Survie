@@ -34,6 +34,8 @@ public enum StoreError: LocalizedError {
     case sqlite(String)
     /// L'index a été construit avec un autre modèle d'embeddings.
     case modeleIncompatible(index: String, requete: String)
+    /// Même nom de modèle, mais les vecteurs ne concordent pas.
+    case temoinDivergent(cosinus: Float)
 
     public var errorDescription: String? {
         switch self {
@@ -42,6 +44,10 @@ public enum StoreError: LocalizedError {
                    "Construis-le avec : make fetch && make ingest && make db"
         case .sqlite(let msg):
             return "Erreur SQLite : \(msg)"
+        case .temoinDivergent(let cos):
+            return """
+                Le vecteur témoin ne concorde pas : cosinus \(String(format: "%.3f", cos))                 (minimum \(Store.temoinMinimum)). L'index et cette application ne                 produisent pas les mêmes vecteurs pour la même phrase — pooling,                 quantification ou conversion de poids diffèrent. Reconstruis l'index                 avec l'implémentation qui l'interroge.
+                """
         case .modeleIncompatible(let index, let requete):
             return """
                 L'index a été construit avec « \(index) » mais la requête utilise \
@@ -57,8 +63,14 @@ public final class Store {
     private var db: OpaquePointer?
     public let meta: [String: String]
     public let embedModel: String
+    /// Bibliothèque qui a produit les vecteurs de l'index (« mlx », « st »…).
+    /// Vide pour un index bâti avant que le backend ne soit consigné.
+    public let embedBackend: String
     public let embedDim: Int
     public let chunkCount: Int
+    /// Vecteur de `Store.phraseTemoin` tel que l'a produit l'implémentation qui
+    /// a bâti l'index. `nil` pour un index antérieur au témoin.
+    public let embedTemoin: [Float]?
 
     /// Matrice des vecteurs, chargée paresseusement puis conservée.
     /// Recherche exhaustive assumée : à l'échelle du corpus (quelques dizaines
@@ -83,20 +95,71 @@ public final class Store {
         }
         self.meta = m
         self.embedModel = m["embed_model"] ?? "?"
+        self.embedBackend = m["embed_backend"] ?? ""
         self.embedDim = Int(m["embed_dim"] ?? "0") ?? 0
         self.chunkCount = Int(m["chunk_count"] ?? "0") ?? 0
+        self.embedTemoin = Store.decoderTemoin(m["embed_temoin"])
+    }
+
+    /// Phrase témoin. Doit rester identique à `ingest.embed.PHRASE_TEMOIN`,
+    /// au caractère près — c'est la moitié du contrôle.
+    public static let phraseTemoin =
+        "hypothermie : sortir du vent, isoler du sol, réchauffer le tronc"
+
+    /// Cosinus minimal entre le témoin de l'index et celui de la requête. Deux
+    /// exécutions de la même implémentation ne diffèrent que par l'arrondi ;
+    /// deux implémentations différentes tombent bien plus bas — 0,78 mesuré
+    /// entre sentence-transformers et MLX sur le même bge-m3.
+    public static let temoinMinimum: Float = 0.99
+
+    private static func decoderTemoin(_ b64: String?) -> [Float]? {
+        guard let b64, !b64.isEmpty,
+              let data = Data(base64Encoded: b64), data.count % 4 == 0
+        else { return nil }
+        return data.withUnsafeBytes { Array($0.bindMemory(to: Float.self)) }
+    }
+
+    /// Contrôle numérique : la requête retrouve-t-elle le vecteur de l'index ?
+    ///
+    /// Le nom du modèle et celui du backend sont des déclarations ; ceci est
+    /// une mesure. C'est le seul contrôle qui attrape deux bibliothèques — ou
+    /// deux langages — produisant des vecteurs différents sous le même nom :
+    /// pooling divergent, quantification, conversion de poids. Parité avec
+    /// `Store.check_temoin` côté Python.
+    public func verifierTemoin(_ vecteur: [Float]) throws {
+        guard let attendu = embedTemoin else { return }
+        guard vecteur.count == attendu.count else {
+            throw StoreError.temoinDivergent(cosinus: 0)
+        }
+        var produit: Float = 0, norme: Float = 0
+        for (a, b) in zip(vecteur, attendu) { produit += a * b; norme += a * a }
+        let cos = norme > 1e-9 ? produit / sqrt(norme) : 0
+        guard cos >= Store.temoinMinimum else {
+            throw StoreError.temoinDivergent(cosinus: cos)
+        }
     }
 
     deinit { if let db { sqlite3_close(db) } }
 
-    /// Refuse un modèle de requête différent de celui qui a bâti l'index.
+    /// Refuse un modèle — ou un backend — de requête différent de l'index.
     ///
     /// Ce désaccord ne provoque aucune erreur visible : il renvoie simplement
     /// des résultats sans rapport, avec la même assurance. C'est le seul
     /// endroit où on peut l'attraper.
-    public func verifierEmbedder(_ nom: String) throws {
+    ///
+    /// Le backend compte autant que le nom : « BAAI/bge-m3 » chargé par MLX et
+    /// par sentence-transformers porte le même nom et la même dimension, et
+    /// peut rendre d'autres vecteurs — il suffit que l'un prenne le token CLS
+    /// et l'autre la moyenne des tokens. Un index vaut pour un couple
+    /// (modèle, backend). Parité avec `Store.check_embedder` côté Python.
+    public func verifierEmbedder(_ nom: String, backend: String = "") throws {
         guard nom == embedModel else {
             throw StoreError.modeleIncompatible(index: embedModel, requete: nom)
+        }
+        // Index antérieur à la consignation du backend : rien à comparer.
+        guard embedBackend.isEmpty || backend.isEmpty || backend == embedBackend else {
+            throw StoreError.modeleIncompatible(index: "\(embedModel) via \(embedBackend)",
+                                                requete: "\(nom) via \(backend)")
         }
     }
 

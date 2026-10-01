@@ -68,18 +68,51 @@ public enum Prompt {
         "quelle espece", "quel champignon", "quelle baie",
     ]
 
+    /// Radicaux, pas mots entiers : voir `contientEspece` pour la règle de
+    /// correspondance. La liste doit rester identique à `_ESPECES` côté Python.
+    ///
+    /// Deux graphies figurent pour « œnanthe » : le pliage retire les accents,
+    /// pas les ligatures, et la plante se tape aussi bien avec que sans.
     static let especesSensibles = [
         "chataigne", "marron", "ail des ours", "colchique", "arum", "cigue",
         "sureau", "yeble", "digitale", "consoude", "amanite", "phalloide",
         "cortinaire", "girolle", "cepe", "bolet", "lepiote", "coulemelle",
-        "russule", "galerine", "ombellifere", "carotte sauvage", "panais",
-        "oenanthe", "belladone", "datura", "morelle", "prunelle", "cynorrhodon",
+        "russule", "galerine", "ombellifere", "obellifere", "carotte sauvage",
+        "panais", "oenanthe", "œnanthe", "belladone", "datura", "morelle",
+        "if", "fougere", "prunelle", "cynorrhodon",
     ]
+
+    /// Vrai si `q` — déjà plié — contient `radical` en tête de mot, suivi au
+    /// plus d'une marque de pluriel.
+    ///
+    /// Une simple recherche de sous-chaîne ne convient pas dans les deux sens :
+    /// sans ancrage à gauche « cepe » attrape « cependant », et sans le pluriel
+    /// « amanites » passe inaperçu — or « j'ai ramassé des amanites » est
+    /// exactement la phrase qu'on tape avant un accident. Parité avec le motif
+    /// Python `\b(?:…)(?:s|es|x)?\b`.
+    static func contientEspece(_ q: String, _ radical: String) -> Bool {
+        var depuis = q.startIndex
+        while let r = q.range(of: radical, range: depuis..<q.endIndex) {
+            depuis = q.index(after: r.lowerBound)
+            if r.lowerBound > q.startIndex {
+                let avant = q[q.index(before: r.lowerBound)]
+                if avant.isLetter || avant.isNumber { continue }
+            }
+            var fin = r.upperBound
+            for marque in ["es", "s", "x"] where q[fin...].hasPrefix(marque) {
+                fin = q.index(fin, offsetBy: marque.count)
+                break
+            }
+            if fin == q.endIndex { return true }
+            if !(q[fin].isLetter || q[fin].isNumber) { return true }
+        }
+        return false
+    }
 
     public static func estIdentification(_ question: String) -> Bool {
         let q = Retrieve.plier(question)
         if motifsIdentification.contains(where: { q.contains($0) }) { return true }
-        if especesSensibles.contains(where: { q.contains($0) }) { return true }
+        if especesSensibles.contains(where: { contientEspece(q, $0) }) { return true }
         // Question posée comme une alternative : « châtaigne ou marron ? »
         let objets = ["champignon", "plante", "baie", "fruit", "feuille", "fleur", "racine"]
         return objets.contains(where: { q.contains($0) }) && q.contains(" ou ")

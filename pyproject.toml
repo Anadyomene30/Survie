@@ -18,9 +18,14 @@ extract = [
     "libzim>=3.13",
 ]
 # Embeddings + LLM sur Apple Silicon. N'installe rien sur Linux.
+#
+# mlx-embeddings porte le backend d'embeddings de production : sans lui,
+# SURVIE_EMBEDDER=mlx échoue à l'import et retombe silencieusement sur
+# sentence-transformers, c'est-à-dire sur un AUTRE modèle. Il manquait ici.
 mlx = [
     "mlx>=0.18; platform_machine == 'arm64' and sys_platform == 'darwin'",
     "mlx-lm>=0.19; platform_machine == 'arm64' and sys_platform == 'darwin'",
+    "mlx-embeddings>=0.1.0; platform_machine == 'arm64' and sys_platform == 'darwin'",
     "sentence-transformers>=3.0",
 ]
 dev = [

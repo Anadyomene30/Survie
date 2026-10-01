@@ -1,0 +1,121 @@
+{
+  "cbnsa-flore-dordogne": {
+    "licence": "libre-acces",
+    "sha256": "4ab149a42224cb5714d3e4253014ce21a062b5343ecd0b707b4944da51efbc30",
+    "taille": 3365905,
+    "titre": "Inventaire de la flore sauvage de Dordogne",
+    "url": "https://obv-na.fr/ofsa/ressources/8_docs/CBNSA_2016-Bilan_Inventaire_24_v1.0.pdf"
+  },
+  "coste-flore": {
+    "licence": "public-domain",
+    "sha256": "f1e4f2db9c69ddb37cc9968eb4c29559f92a7cc0e7ee24ab3658c206cc056b67",
+    "taille": 77932459,
+    "titre": "Flore descriptive et illustrée de la France — tome 3",
+    "url": "https://archive.org/download/floredescriptive03cost/floredescriptive03cost.pdf"
+  },
+  "emergency-war-surgery": {
+    "licence": "public-domain",
+    "sha256": "08916d2f2eb2ea00f4abf1f81986c6e7e967eb800be8dbdbf75a00c796c18db8",
+    "taille": 30449659,
+    "titre": "Emergency War Surgery (5e éd.)",
+    "url": "https://archive.org/download/emergency-war-surgery-5th-ed.-2018/Emergency%20War%20Surgery%205th%20ed.%20%202018.pdf"
+  },
+  "fm-21-10": {
+    "licence": "public-domain",
+    "sha256": "e024b79ca8c638355eb70f33bb62bccc8070ab2d669bcfa9ad9e5c1ad9e43732",
+    "taille": 362339,
+    "titre": "TC 4-02.3 — Field Hygiene and Sanitation",
+    "url": "https://archive.org/download/tc-4-02.3-field-hygiene-and-sanitation-may-2015/TC%204_02.3%20Field%20Hygiene%20and%20Sanitation%20May%202015.pdf"
+  },
+  "fm-21-76": {
+    "licence": "public-domain",
+    "sha256": "8498a427a6338156fa0b7c0ad4aeaeba6ff57106d6cc652efd0df643a688a481",
+    "taille": 3023620,
+    "titre": "FM 21-76 — Survival",
+    "url": "https://archive.org/download/Fm21-76SurvivalManual/FM21-76_SurvivalManual.pdf"
+  },
+  "fm-21-76-1": {
+    "licence": "public-domain",
+    "sha256": "a03bea830254d17cbe4755c6a94b789624b18574b7269dd67086b2af9a550b92",
+    "taille": 3147356,
+    "titre": "MCRP 3-02H — Survival, Evasion and Recovery",
+    "url": "https://archive.org/download/mcrp-3-02-h-survival-evasion-and-recovery/MCRP%203-02H%20Survival%2C%20Evasion%20and%20Recovery.pdf"
+  },
+  "fm-3-05-70": {
+    "licence": "public-domain",
+    "sha256": "76905fc16b14b2a57eb646adb6f3c238dcfb161d66ff1103a2a7b702e20e0f32",
+    "taille": 21019230,
+    "titre": "FM 3-05.70 — Survival (révision de FM 21-76)",
+    "url": "https://archive.org/download/fm-3-05.70-survival-2002/FM%203-05.70%20Survival%20%202002.pdf"
+  },
+  "fm-3-25-26": {
+    "licence": "public-domain",
+    "sha256": "bf92a942048931c59f2b48b366acd9b5f8f40120b0866d702dec799a4e8be24c",
+    "taille": 8167056,
+    "titre": "FM 3-25.26 — Map Reading and Land Navigation",
+    "url": "https://archive.org/download/FM3-25x26/FM3-25x26.pdf"
+  },
+  "grays-anatomy-1918": {
+    "licence": "public-domain",
+    "sha256": "fcd9a217f22f7bf8c342f24f7b722f33daadfb1d2a72db3865e8e4045d2ab910",
+    "taille": 306410,
+    "titre": "Anatomy of the Human Body (Gray's Anatomy, 20e éd.)",
+    "url": "https://www.gutenberg.org/ebooks/8942.epub.noimages"
+  },
+  "kings-dispensatory": {
+    "licence": "public-domain",
+    "sha256": "3c2a3887b0e726fd3507fffd7a38e2294a8450e29842b896b387b735141879aa",
+    "taille": 71105794,
+    "titre": "King's American Dispensatory — tome 1",
+    "url": "https://archive.org/download/kingsamericandis01kinguoft/kingsamericandis01kinguoft.pdf"
+  },
+  "kings-dispensatory-2": {
+    "licence": "public-domain",
+    "sha256": "ab7737d49785071ada1be62f9e3d78bfbaae3738df03474b8a4d9c5aec393203",
+    "taille": 97287195,
+    "titre": "King's American Dispensatory — tome 2",
+    "url": "https://archive.org/download/kingsamericandis02kinguoft/kingsamericandis02kinguoft.pdf"
+  },
+  "nwss": {
+    "licence": "libre-diffusion",
+    "sha256": "c877192aca05b6bbacc437ba60d0c5a95f9737e8b2144e03a3641b60640d66bc",
+    "taille": 8237831,
+    "titre": "Nuclear War Survival Skills",
+    "url": "https://archive.org/download/nuclear-war-survival-skills_202605/Nuclear%20War%20Survival%20Skills.pdf"
+  },
+  "ranger-handbook": {
+    "licence": "public-domain",
+    "sha256": "c94af826ddc980880cf107bd13945fc89e1b8b9577715fbe7516a21527f3b46f",
+    "taille": 10236628,
+    "titre": "Ranger Handbook SH 21-76",
+    "url": "https://archive.org/download/sunglass_paladin_archive_department_of_the_us_army___ranger_handbook_sh_21_/Department%20of%20the%20U.S.%20Army%20-%20Ranger%20Handbook%20%28SH%2021-76%29.pdf"
+  },
+  "sof-medical-handbook": {
+    "licence": "public-domain",
+    "sha256": "8af797930c9884a0824fa481a4a4721eb6cb056ae48b051130dab9169a6fd1f7",
+    "taille": 39435808,
+    "titre": "Special Operations Forces Medical Handbook",
+    "url": "https://archive.org/download/SOFMH2001/SOFMH2001.pdf"
+  },
+  "taxref": {
+    "licence": "licence-ouverte",
+    "sha256": "e92da551f9c7def6825386352892d84710d3d7b05276295362a0034f45f3d89a",
+    "taille": 37841,
+    "titre": "TAXREF — référentiel taxonomique national",
+    "url": "https://inpn.mnhn.fr/telechargement/referentielEspece/taxref/18.0/menu"
+  },
+  "who-basic-emergency-care": {
+    "licence": "cc-by-nc-sa",
+    "sha256": "51e5000a8f268d67f28a8206e7b8a35ba7877bec0b45e28084970b074e00043e",
+    "taille": 4257552,
+    "titre": "Basic Emergency Care: approach to the acutely ill and injured",
+    "url": "https://iris.who.int/server/api/core/bitstreams/63432b9f-8808-44c5-9692-cea717c0cbda/content"
+  },
+  "who-water-quality": {
+    "licence": "cc-by-nc-sa",
+    "sha256": "455aa3fd03d988002bf22c9b7fd1e954b323afcb4dce29ae708ab89c5729471d",
+    "taille": 4114332,
+    "titre": "Guidelines for Drinking-water Quality (4e éd.)",
+    "url": "https://iris.who.int/server/api/core/bitstreams/1b7a285e-3635-45dd-a1a9-6068c8fbe173/content"
+  }
+}

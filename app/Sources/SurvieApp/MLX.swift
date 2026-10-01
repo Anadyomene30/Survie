@@ -17,10 +17,16 @@ import MLXLMCommon
 /// validation dans docs/DEMARRAGE-MAC.md.
 final class MLXEmbedder: Embedder, @unchecked Sendable {
     let nom: String
+    let backend = "mlx"
     private let conteneur: ModelContainer
     private let pooling: Pooling
 
-    init(modele: String = "BAAI/bge-m3", pooling: Pooling = .cls) throws {
+    /// `BAAI/bge-m3` ne publie que `pytorch_model.bin` : ni mlx-embeddings ni
+    /// mlx-swift n'y trouvent de safetensors. C'est la conversion MLX du même
+    /// modèle qu'il faut charger — la même que celle qui a bâti l'index, sans
+    /// quoi le contrôle du vecteur témoin refusera de servir.
+    init(modele: String = "mlx-community/bge-m3-mlx-fp16",
+         pooling: Pooling = .cls) throws {
         self.nom = modele
         self.pooling = pooling
         self.conteneur = try MLXEmbedders.loadModelContainer(
@@ -91,6 +97,7 @@ final class MLXGenerateur: Generateur, @unchecked Sendable {
 
 final class MLXEmbedder: Embedder, @unchecked Sendable {
     let nom = "aucun"
+    let backend = "mlx"
     init(modele: String = "", pooling: Int = 0) throws {
         throw NSError(domain: "Survie", code: 1, userInfo: [
             NSLocalizedDescriptionKey:

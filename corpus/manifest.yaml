@@ -34,17 +34,17 @@ sources:
     licence: public-domain
     domaine: [survie, abri, feu, eau, alimentation, psychologie]
     priorite: 1
-    url: https://upload.wikimedia.org/wikipedia/commons/6/6b/FM_3-05.70_%28FM_21-76%29_Survival_-_May_2002.pdf
+    url: https://archive.org/download/fm-3-05.70-survival-2002/FM%203-05.70%20Survival%20%202002.pdf
 
   - id: fm-21-76-1
-    titre: "FM 21-76-1 — Survival, Evasion and Recovery"
+    titre: "MCRP 3-02H — Survival, Evasion and Recovery"
     auteur: "US Army"
     date: 1999
     langue: en
     licence: public-domain
     domaine: [survie, signalisation, navigation]
     priorite: 2
-    url: https://archive.org/download/FM21-76-1SurvivalEvasionAndRecovery/FM%2021-76-1%20Survival%20Evasion%20and%20Recovery.pdf
+    url: https://archive.org/download/mcrp-3-02-h-survival-evasion-and-recovery/MCRP%203-02H%20Survival%2C%20Evasion%20and%20Recovery.pdf
 
   - id: fm-3-25-26
     titre: "FM 3-25.26 — Map Reading and Land Navigation"
@@ -54,17 +54,17 @@ sources:
     licence: public-domain
     domaine: [navigation, cartographie]
     priorite: 1
-    url: https://archive.org/download/FM3-25.26MapReadingAndLandNavigation/FM%203-25.26.pdf
+    url: https://archive.org/download/FM3-25x26/FM3-25x26.pdf
 
   - id: fm-21-10
-    titre: "FM 21-10 — Field Hygiene and Sanitation"
+    titre: "TC 4-02.3 — Field Hygiene and Sanitation"
     auteur: "US Army"
-    date: 2000
+    date: 2015
     langue: en
     licence: public-domain
     domaine: [hygiene, eau, assainissement, sante]
     priorite: 1
-    url: https://archive.org/download/FM21-10FieldHygieneAndSanitation/FM%2021-10.pdf
+    url: https://archive.org/download/tc-4-02.3-field-hygiene-and-sanitation-may-2015/TC%204_02.3%20Field%20Hygiene%20and%20Sanitation%20May%202015.pdf
 
   - id: ranger-handbook
     titre: "Ranger Handbook SH 21-76"
@@ -74,7 +74,7 @@ sources:
     licence: public-domain
     domaine: [survie, deplacement, cordage, terrain]
     priorite: 2
-    url: https://archive.org/download/RangerHandbook2017/Ranger%20Handbook%202017.pdf
+    url: https://archive.org/download/sunglass_paladin_archive_department_of_the_us_army___ranger_handbook_sh_21_/Department%20of%20the%20U.S.%20Army%20-%20Ranger%20Handbook%20%28SH%2021-76%29.pdf
 
 # ═══════════════════════════════════════════════════════════════════
 # MÉDECINE EN MILIEU ISOLÉ — libre / Creative Commons
@@ -88,6 +88,10 @@ sources:
     licence: cc-by-nc-sa
     domaine: [medecine, premiers-secours, diagnostic, medicaments]
     priorite: 1
+    note: >-
+      INDISPONIBLE au 11 septembre 2026 : hesperian.org répond 522, le lien direct 404.
+      Aucun remplacement libre trouvé. Le pipeline ignore les sources
+      absentes ; à déposer à la main dans corpus/public/ si tu l'obtiens.
     url: https://en.hesperian.org/wp-content/uploads/pdf/en_wtnd_2021/en_wtnd_2021_full_book.pdf
 
   - id: wtin-dentist
@@ -98,6 +102,10 @@ sources:
     licence: cc-by-nc-sa
     domaine: [medecine, dentaire]
     priorite: 2
+    note: >-
+      INDISPONIBLE au 11 septembre 2026 : hesperian.org répond 522, le lien direct 404.
+      Aucun remplacement libre trouvé. Le pipeline ignore les sources
+      absentes ; à déposer à la main dans corpus/public/ si tu l'obtiens.
     url: https://en.hesperian.org/wp-content/uploads/pdf/en_dentist_2021/en_dentist_2021_full_book.pdf
 
   - id: hesperian-midwives
@@ -108,6 +116,10 @@ sources:
     licence: cc-by-nc-sa
     domaine: [medecine, obstetrique]
     priorite: 3
+    note: >-
+      INDISPONIBLE au 11 septembre 2026 : hesperian.org répond 522, le lien direct 404.
+      Aucun remplacement libre trouvé. Le pipeline ignore les sources
+      absentes ; à déposer à la main dans corpus/public/ si tu l'obtiens.
     url: https://en.hesperian.org/wp-content/uploads/pdf/en_bfm_2010/en_bfm_2010_full_book.pdf
 
   - id: msf-guide-clinique
@@ -121,6 +133,11 @@ sources:
     note: >-
       Référence médicale francophone majeure du corpus. Consultable et
       téléchargeable sur medicalguidelines.msf.org (versions PDF et EPUB).
+    note: >-
+      INDISPONIBLE au 11 septembre 2026 : MSF a basculé ses guides dans une application web ; il n'y a plus
+      de PDF public à une URL stable.
+      Aucun remplacement libre trouvé. Le pipeline ignore les sources
+      absentes ; à déposer à la main dans corpus/public/ si tu l'obtiens.
     url: https://medicalguidelines.msf.org/fr/viewport/CG/francais/guide-clinique-et-therapeutique-16686604.html
 
   - id: msf-medicaments-essentiels
@@ -131,6 +148,11 @@ sources:
     licence: libre-acces
     domaine: [medecine, pharmacologie, posologie]
     priorite: 1
+    note: >-
+      INDISPONIBLE au 11 septembre 2026 : MSF a basculé ses guides dans une application web ; il n'y a plus
+      de PDF public à une URL stable.
+      Aucun remplacement libre trouvé. Le pipeline ignore les sources
+      absentes ; à déposer à la main dans corpus/public/ si tu l'obtiens.
     url: https://medicalguidelines.msf.org/fr/viewport/EssDr/francais/medicaments-essentiels-guide-pratique-d-utilisation-16682376.html
 
   - id: who-basic-emergency-care
@@ -141,7 +163,7 @@ sources:
     licence: cc-by-nc-sa
     domaine: [medecine, urgence, abcde, traumatologie]
     priorite: 1
-    url: https://iris.who.int/bitstream/handle/10665/275635/9789241513081-eng.pdf
+    url: https://iris.who.int/server/api/core/bitstreams/63432b9f-8808-44c5-9692-cea717c0cbda/content
 
   - id: who-water-quality
     titre: "Guidelines for Drinking-water Quality (4e éd.)"
@@ -151,17 +173,17 @@ sources:
     licence: cc-by-nc-sa
     domaine: [eau, potabilisation, sante]
     priorite: 1
-    url: https://iris.who.int/bitstream/handle/10665/352532/9789240045064-eng.pdf
+    url: https://iris.who.int/server/api/core/bitstreams/1b7a285e-3635-45dd-a1a9-6068c8fbe173/content
 
   - id: emergency-war-surgery
-    titre: "Emergency War Surgery"
+    titre: "Emergency War Surgery (5e éd.)"
     auteur: "Borden Institute, US Army"
     date: 2013
     langue: en
     licence: public-domain
     domaine: [medecine, chirurgie, traumatologie, hemorragie]
     priorite: 2
-    url: https://archive.org/download/EmergencyWarSurgery2013/Emergency%20War%20Surgery%202013.pdf
+    url: https://archive.org/download/emergency-war-surgery-5th-ed.-2018/Emergency%20War%20Surgery%205th%20ed.%20%202018.pdf
 
   - id: sof-medical-handbook
     titre: "Special Operations Forces Medical Handbook"
@@ -171,7 +193,7 @@ sources:
     licence: public-domain
     domaine: [medecine, milieu-isole, traumatologie]
     priorite: 2
-    url: https://archive.org/download/SpecialOperationsForcesMedicalHandbook/SOF%20Medical%20Handbook.pdf
+    url: https://archive.org/download/SOFMH2001/SOFMH2001.pdf
 
 # ═══════════════════════════════════════════════════════════════════
 # NRBC / CATASTROPHES
@@ -185,7 +207,7 @@ sources:
     licence: libre-diffusion
     domaine: [nrbc, radioprotection, abri, eau]
     priorite: 1
-    url: https://archive.org/download/NuclearWarSurvivalSkills/Nuclear%20War%20Survival%20Skills.pdf
+    url: https://archive.org/download/nuclear-war-survival-skills_202605/Nuclear%20War%20Survival%20Skills.pdf
 
   - id: fema-are-you-ready
     titre: "Are You Ready? An In-depth Guide to Citizen Preparedness"
@@ -195,7 +217,13 @@ sources:
     licence: public-domain
     domaine: [preparation, catastrophes, famille]
     priorite: 2
-    url: https://www.fema.gov/pdf/areyouready/areyouready_full.pdf
+    note: >-
+      L'URL est bonne (vérifiée au 11 septembre 2026) mais ready.gov refuse
+      les clients TLS non navigateurs : urllib reçoit 403 là où curl obtient
+      200, quel que soit l'en-tête User-Agent. À récupérer à la main :
+      curl -L -o corpus/public/fema-are-you-ready.pdf
+      https://www.ready.gov/sites/default/files/2021-11/are-you-ready-guide.pdf
+    url: https://www.ready.gov/sites/default/files/2021-11/are-you-ready-guide.pdf
 
 # ═══════════════════════════════════════════════════════════════════
 # EAU, ALIMENTATION, AUTONOMIE
@@ -209,6 +237,11 @@ sources:
     licence: public-domain
     domaine: [conservation, alimentation, botulisme]
     priorite: 1
+    note: >-
+      INDISPONIBLE au 11 septembre 2026 : nchfp.uga.edu a été réorganisé ; les PDF ne sont plus exposés en
+      lien direct depuis les pages publiques.
+      Aucun remplacement libre trouvé. Le pipeline ignore les sources
+      absentes ; à déposer à la main dans corpus/public/ si tu l'obtiens.
     url: https://nchfp.uga.edu/publications/publications_usda.html
 
 # ═══════════════════════════════════════════════════════════════════
@@ -216,7 +249,7 @@ sources:
 # ═══════════════════════════════════════════════════════════════════
 
   - id: coste-flore
-    titre: "Flore descriptive et illustrée de la France, de la Corse et des contrées limitrophes"
+    titre: "Flore descriptive et illustrée de la France — tome 3"
     auteur: "Abbé Hippolyte Coste"
     date: 1906
     langue: fr
@@ -226,7 +259,7 @@ sources:
     note: >-
       Flore de référence française tombée dans le domaine public. Nomenclature
       ancienne : à confronter systématiquement à TAXREF pour les noms actuels.
-    url: https://archive.org/download/floredescriptive01cost/floredescriptive01cost.pdf
+    url: https://archive.org/download/floredescriptive03cost/floredescriptive03cost.pdf
 
   - id: cbnsa-flore-dordogne
     titre: "Inventaire de la flore sauvage de Dordogne"
@@ -254,7 +287,7 @@ sources:
 # ═══════════════════════════════════════════════════════════════════
 
   - id: kings-dispensatory
-    titre: "King's American Dispensatory"
+    titre: "King's American Dispensatory — tome 1"
     auteur: "Harvey Wickes Felter & John Uri Lloyd"
     date: 1898
     langue: en
@@ -264,7 +297,20 @@ sources:
     note: >-
       Pharmacopée du XIXe siècle. Valeur historique et ethnobotanique ; les
       posologies NE DOIVENT PAS être suivies. Marquée priorite 3 pour cette raison.
-    url: https://archive.org/download/kingsamericandis01felt/kingsamericandis01felt.pdf
+    url: https://archive.org/download/kingsamericandis01kinguoft/kingsamericandis01kinguoft.pdf
+
+  - id: kings-dispensatory-2
+    titre: "King's American Dispensatory — tome 2"
+    auteur: "Harvey Wickes Felter & John Uri Lloyd"
+    date: 1898
+    langue: en
+    licence: public-domain
+    domaine: [phytotherapie, pharmacopee, plantes-medicinales]
+    priorite: 3
+    note: >-
+      Pharmacopée du XIXe siècle. Valeur historique et ethnobotanique ; les
+      posologies NE DOIVENT PAS être suivies. Marquée priorite 3 pour cette raison.
+    url: https://archive.org/download/kingsamericandis02kinguoft/kingsamericandis02kinguoft.pdf
 
   - id: grays-anatomy-1918
     titre: "Anatomy of the Human Body (Gray's Anatomy, 20e éd.)"

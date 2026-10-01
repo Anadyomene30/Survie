@@ -110,7 +110,9 @@ struct VueSources: View {
 
     private func lien(_ id: String) -> Binding<Bool> {
         Binding(get: { deplie.contains(id) },
-                set: { $0 ? deplie.insert(id) : deplie.remove(id) })
+                set: { ouvert in
+                    if ouvert { deplie.insert(id) } else { deplie.remove(id) }
+                })
     }
 
     private func vignette(_ p: Passage) -> NSImage? {

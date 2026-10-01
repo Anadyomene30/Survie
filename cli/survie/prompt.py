@@ -77,12 +77,18 @@ _IDENT = re.compile(
 # Noms d'espèces et de familles fréquemment confondues : leur simple présence
 # suffit à déclencher la règle de sûreté. Sur-déclencher est sans conséquence
 # (on ajoute un avertissement) ; sous-déclencher peut tuer.
+#
+# Le pluriel fait partie du nom. « j'ai ramassé des amanites » est exactement
+# la phrase qu'on tape avant un accident, et un motif ancré des deux côtés ne
+# la voyait pas : on accepte donc une marque de pluriel après le radical. On ne
+# va pas jusqu'à accepter n'importe quelle suite — « cèpe » attraperait alors
+# « cependant ».
 _ESPECES = re.compile(
     r"\b(?:ch[âa]taigne|marron|ail des ours|colchique|arum|cigu[ëe]|"
     r"sureau|y[èe]ble|digitale|consoude|amanite|phallo[ïi]de|cortinaire|"
     r"girolle|c[èe]pe|bolet|l[ée]piote|coulemelle|russule|gal[ée]rine|"
-    r"omb?ellif[èe]re|carotte sauvage|panais|[œoe]nanthe|belladone|datura|"
-    r"morelle|if|fouq?g[èe]re|prunelle|cynorrhodon)\b",
+    r"omb?ellif[èe]re|carotte sauvage|panais|(?:œ|oe)nanthe|belladone|datura|"
+    r"morelle|if|foug[èe]re|prunelle|cynorrhodon)(?:s|es|x)?\b",
     re.I,
 )
 

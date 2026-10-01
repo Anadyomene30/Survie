@@ -4,22 +4,43 @@
 Pourquoi ce script existe.
 
 Le choix du modèle d'embeddings est le verrou du projet : en changer impose de
-tout réindexer. Et deux pannes possibles ne produisent AUCUN message d'erreur.
+tout réindexer. Et trois pannes possibles ne produisent AUCUN message d'erreur.
 
 1. Le modèle ne se charge pas du tout — visible, tant mieux.
-2. Le modèle se charge, produit des vecteurs de la bonne dimension, mais avec
-   le MAUVAIS POOLING. BGE-M3 construit son vecteur dense à partir du token
-   CLS ; si la bibliothèque applique une moyenne sur les tokens, tout continue
-   de fonctionner, mais la qualité de recherche est nettement dégradée. Rien ne
-   le signale : ni erreur, ni avertissement, ni dimension anormale.
+2. Le backend demandé échoue et le code retombe sur un autre. Tout continue de
+   fonctionner, avec d'autres vecteurs que ceux qu'on croit. Mesuré ici le
+   11 septembre 2026 : `BAAI/bge-m3` ne publie que `pytorch_model.bin`,
+   mlx-embeddings n'y trouve pas de safetensors, et le repli
+   sentence-transformers se faisait sans que le rapport ne le dise.
+3. Le modèle se charge, produit des vecteurs de la bonne dimension, mais avec
+   un POOLING différent. Rien ne le signale : ni erreur, ni dimension anormale.
 
-Ce script teste le second cas de la seule manière fiable : sur des paires de
-phrases françaises dont on connaît la proximité attendue. Un modèle sain doit
-juger « je tremble et j'ai froid » plus proche de « hypothermie » que de
-« recette de cuisine ». Un pooling cassé brouille précisément ces écarts.
+Ce script mesure les trois. Il affiche le backend RÉELLEMENT obtenu, et compare
+des paires de phrases françaises dont on connaît la proximité attendue.
 
     python scripts/valider-embedder.py
-    SURVIE_EMBED_MODEL=intfloat/multilingual-e5-large python scripts/valider-embedder.py
+    SURVIE_EMBEDDER=mlx python scripts/valider-embedder.py
+    SURVIE_EMBED_MODEL=intfloat/multilingual-e5-large \\
+        SURVIE_QUERY_PREFIX='query: ' SURVIE_DOC_PREFIX='passage: ' \\
+        python scripts/valider-embedder.py
+
+COMMENT ON JUGE — et pourquoi pas par un écart de cosinus absolu.
+
+Un seuil absolu (« au moins 0,10 d'écart ») n'est pas comparable d'un modèle à
+l'autre : chacun a son propre plancher de similarité. Mesuré sur les mêmes six
+paires : bge-m3 via sentence-transformers place les phrases sans rapport autour
+de 0,36 ; le même bge-m3 converti pour MLX, autour de 0,63 ; multilingual-e5,
+autour de 0,78. Un seuil fixe rejette e5 sans rien dire de sa qualité — il ne
+mesure que l'échelle du modèle.
+
+On mesure donc deux choses qui, elles, ont un sens pour tous :
+
+- **l'ordre** : la phrase proche doit être mieux classée que la lointaine. Un
+  pooling cassé détruit l'ordre, pas seulement la marge. C'est éliminatoire.
+- **la séparation** : de combien d'écarts-types la phrase proche dépasse-t-elle
+  le bruit du modèle lui-même — mesuré sur toutes les combinaisons sans
+  rapport. Un z de 2 veut dire « nettement hors du bruit », quel que soit le
+  plancher du modèle.
 """
 
 from __future__ import annotations
@@ -58,65 +79,144 @@ PAIRES = [
      "entretien d'un aquarium d'eau douce"),
 ]
 
-SEUIL_ECART = 0.10   # marge minimale attendue entre proche et lointain
+# Séparation moyenne minimale, en écarts-types du bruit du modèle.
+# Mesuré : 2,30 pour bge-m3 via MLX, 1,95 via sentence-transformers, 1,80 pour
+# multilingual-e5-large. En dessous de 1,5, le modèle ne distingue plus le
+# pertinent du décor.
+SEUIL_SEPARATION = 1.5
+# En dessous, la paire est signalée sans faire échouer : certaines questions
+# n'ont aucun mot commun avec leur réponse, et c'est justement le cas que le
+# plein texte ne sait pas traiter.
+SEUIL_PAIRE = 1.0
+
+
+def mesurer(emb) -> tuple[int, np.ndarray, float, float, np.ndarray]:
+    """Renvoie (paires bien ordonnées, z par paire, bruit moyen, écart-type,
+    matrice question × candidat)."""
+    questions = [p[0] for p in PAIRES]
+    proches = [p[1] for p in PAIRES]
+    lointains = [p[2] for p in PAIRES]
+
+    # Asymétrie respectée : la question est encodée comme une requête, les
+    # candidats comme des passages. e5 s'effondre si on l'ignore.
+    Q = _normaliser(emb.encode(questions, is_query=True))
+    C = _normaliser(np.concatenate([emb.encode(proches), emb.encode(lointains)]))
+
+    n = len(PAIRES)
+    S = Q @ C.T
+
+    # Bruit : toutes les combinaisons question × candidat SANS rapport.
+    bruit = np.array([S[i, j] for i in range(n) for j in range(2 * n) if j % n != i])
+    mu, sd = float(bruit.mean()), float(max(bruit.std(), 1e-9))
+
+    z = np.array([(S[i, i] - mu) / sd for i in range(n)])
+    ordre = sum(1 for i in range(n) if S[i, i] > S[i, n + i])
+    return ordre, z, mu, sd, S
+
+
+def _normaliser(m: np.ndarray) -> np.ndarray:
+    return m / np.maximum(np.linalg.norm(m, axis=1, keepdims=True), 1e-9)
 
 
 def main() -> int:
-    print(f"Modèle demandé : {config.EMBED_MODEL}")
-    print(f"Backend        : {config.EMBED_BACKEND}\n")
+    demande = config.EMBED_BACKEND
+    print(f"Modèle demandé : {config.EMBED_MODEL}"
+          f"{'' if config.EMBED_MODEL_EXPLICITE else '  (défaut, selon le backend)'}")
+    print(f"Backend demandé : {demande}\n")
 
     try:
         emb = get_embedder()
     except Exception as e:
         print(f"ÉCHEC — le modèle ne se charge pas : {e}\n")
-        print("Replis prévus, à essayer dans cet ordre :")
-        print("  SURVIE_EMBED_MODEL=intfloat/multilingual-e5-large  (XLM-R, comme bge-m3)")
-        print("      + SURVIE_QUERY_PREFIX='query: ' SURVIE_DOC_PREFIX='passage: '")
-        print("  SURVIE_EMBED_MODEL=google/embeddinggemma-300m      (petit, rapide)")
-        print("  SURVIE_EMBEDDER=st                                 (sentence-transformers)")
+        _conseils()
         return 1
 
-    print(f"Chargé : {emb.name}, dimension {emb.dim}\n")
+    print(f"Chargé : {emb.name}")
+    print(f"Backend obtenu : {emb.backend}, dimension {emb.dim}\n")
 
-    if emb.name.startswith("hashing-"):
+    if emb.backend == "hashing":
         print("ATTENTION : c'est le backend de TEST, purement lexical.")
         print("Il n'est pas utilisable en production. Force SURVIE_EMBEDDER=mlx.\n")
 
-    echecs = 0
-    print(f"{'proche':>7} {'lointain':>9} {'écart':>7}   phrase")
-    print("─" * 78)
-    for phrase, proche, lointain in PAIRES:
-        v = emb.encode([phrase, proche, lointain])
-        v = v / np.maximum(np.linalg.norm(v, axis=1, keepdims=True), 1e-9)
-        s_proche, s_lointain = float(v[0] @ v[1]), float(v[0] @ v[2])
-        ecart = s_proche - s_lointain
-        ok = ecart >= SEUIL_ECART
-        echecs += not ok
-        marque = " " if ok else "!"
-        print(f"{marque}{s_proche:6.3f} {s_lointain:9.3f} {ecart:7.3f}   {phrase[:44]}")
+    # Le repli silencieux est l'une des trois pannes qu'on traque : un rapport
+    # qui valide un backend en en mesurant un autre ne vaut rien.
+    if demande not in ("auto", emb.backend):
+        print(f"ÉCHEC — backend « {demande} » demandé, « {emb.backend} » obtenu.")
+        print("Le code a replié sans que tu l'aies choisi. Ce qui suit décrirait")
+        print("un autre modèle que celui que tu crois valider.\n")
+        _conseils()
+        return 1
 
+    ordre, z, mu, sd, S = mesurer(emb)
+    n = len(PAIRES)
+
+    print(f"Bruit du modèle (combinaisons sans rapport) : {mu:.3f} ± {sd:.3f}\n")
+    print(f"{'proche':>7} {'lointain':>9} {'écart':>7} {'z':>6}   phrase")
+    print("─" * 78)
+    for i, (phrase, _, _) in enumerate(PAIRES):
+        sp, sl = float(S[i, i]), float(S[i, n + i])
+        marque = " " if sp > sl and z[i] >= SEUIL_PAIRE else "!"
+        print(f"{marque}{sp:6.3f} {sl:9.3f} {sp - sl:7.3f} {z[i]:6.2f}   {phrase[:40]}")
+
+    separation = float(z.mean())
     print()
-    if echecs == 0:
-        print("VALIDÉ — le modèle sépare correctement le pertinent du hors-sujet.")
-        print("Tu peux construire l'index :  make db")
+    print(f"Ordre correct : {ordre}/{n}       "
+          f"Séparation moyenne : {separation:.2f} σ (minimum {SEUIL_SEPARATION})")
+    print()
+
+    if ordre == n and separation >= SEUIL_SEPARATION:
+        faibles = [PAIRES[i][0] for i in range(n) if z[i] < SEUIL_PAIRE]
+        print("VALIDÉ — le modèle classe le pertinent devant le hors-sujet,")
+        print("et l'en sépare nettement.")
+        if faibles:
+            print()
+            print("Paires proches du bruit, à surveiller sans être bloquantes :")
+            for f in faibles:
+                print(f"  · {f}")
+            print("  Ces questions n'ont aucun mot commun avec leur réponse :")
+            print("  c'est exactement ce que la recherche plein texte rate.")
+        print()
+        print("Consigne ces variables — elles doivent être les mêmes à")
+        print("l'indexation et à l'interrogation :")
+        print(f"  SURVIE_EMBEDDER={emb.backend}")
+        print(f"  SURVIE_EMBED_MODEL={emb.name}")
+        if config.EMBED_QUERY_PREFIX or config.EMBED_DOC_PREFIX:
+            print(f"  SURVIE_QUERY_PREFIX='{config.EMBED_QUERY_PREFIX}'")
+            print(f"  SURVIE_DOC_PREFIX='{config.EMBED_DOC_PREFIX}'")
+        print()
+        print("L'index consigne le nom, le backend ET un vecteur témoin : une")
+        print("requête produite autrement sera refusée, pas silencieusement")
+        print("dégradée. Tu peux construire :  make db")
         return 0
 
-    print(f"ÉCHEC — {echecs} paire(s) sur {len(PAIRES)} mal séparée(s).")
+    if ordre < n:
+        print(f"ÉCHEC — {n - ordre} paire(s) mal ordonnée(s) : le modèle place une")
+        print("phrase hors sujet devant la bonne réponse.")
+    else:
+        print(f"ÉCHEC — séparation trop faible ({separation:.2f} σ) : le modèle")
+        print("classe correctement, mais ne détache pas le pertinent du décor.")
     print()
-    print("Cause la plus probable : le POOLING. BGE-M3 attend le token CLS ; si")
-    print("la bibliothèque applique une moyenne sur les tokens, les vecteurs")
-    print("restent valides en apparence mais discriminent mal. C'est exactement")
-    print("le genre de panne qui ne se voit qu'à l'usage, des semaines plus tard.")
-    print()
+    _conseils()
+    return 1
+
+
+def _conseils() -> None:
     print("À essayer, dans l'ordre :")
-    print("  1. Vérifier l'option de pooling exposée par mlx-embeddings.")
+    print()
+    print("  1. Vérifier que le dépôt publie des safetensors. mlx-embeddings ne")
+    print("     charge que ceux-là ; BAAI/bge-m3 n'expose que pytorch_model.bin.")
+    print("     La conversion MLX existe : mlx-community/bge-m3-mlx-fp16.")
+    print()
     print("  2. SURVIE_EMBED_MODEL=intfloat/multilingual-e5-large")
     print("     avec SURVIE_QUERY_PREFIX='query: ' SURVIE_DOC_PREFIX='passage: '")
     print("     (e5 EXIGE ces préfixes ; sans eux la qualité s'effondre)")
-    print("  3. SURVIE_EMBEDDER=st pour comparer avec sentence-transformers,")
-    print("     qui applique le pooling de référence. Si l'écart est bon là et")
-    print("     mauvais en MLX, c'est bien le pooling MLX qui est en cause.")
-    return 1
+    print()
+    print("  3. SURVIE_EMBED_MODEL=mlx-community/embeddinggemma-300m-bf16")
+    print("     SURVIE_EMBED_DIM=768 — plus petit, plus rapide.")
+    print()
+    print("  4. SURVIE_EMBEDDER=st pour comparer avec sentence-transformers, qui")
+    print("     applique le pooling de référence. Un bon résultat là et mauvais")
+    print("     en MLX désigne le pooling MLX.")
 
 
 if __name__ == "__main__":

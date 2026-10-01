@@ -65,15 +65,13 @@ def _charger(path: Path) -> list[Cas]:
 
 
 def run(fichier: Path, db: Path, args) -> int:
-    from ingest.embed import get_embedder
-
-    from .engine import Engine
+    from .engine import Engine, charger_embedder
     from .llm import load as load_llm
     from . import urgence as urgence_mod
     from .prompt import format_extraits
 
     cas = _charger(fichier)
-    embedder = None if getattr(args, "sans_vecteurs", False) else get_embedder()
+    embedder = charger_embedder(getattr(args, "sans_vecteurs", False))
     eng = Engine(db, load_llm(getattr(args, "modele", None)), embedder)
     avec_modele = eng.llm.__class__.__name__ != "NoLLM"
 

@@ -4,6 +4,9 @@ import Foundation
 /// laissé à `nil` pour un fonctionnement en recherche plein texte seule.
 public protocol Embedder: Sendable {
     var nom: String { get }
+    /// Bibliothèque qui produit les vecteurs (« mlx », « st »…). Consignée dans
+    /// l'index et vérifiée au démarrage : voir `Store.verifierEmbedder`.
+    var backend: String { get }
     func encoder(_ textes: [String], requete: Bool) throws -> [[Float]]
 }
 
@@ -49,7 +52,15 @@ public actor Engine {
         self.registre = Divergences.charger(registre ?? defaut)
         // Refuse tôt un index bâti avec un autre modèle : les résultats
         // seraient du bruit, sans le moindre signal d'erreur.
-        if let e = embedder { try store.verifierEmbedder(e.nom) }
+        if let e = embedder {
+            try store.verifierEmbedder(e.nom, backend: e.backend)
+            // Le nom et le backend sont des déclarations ; le témoin est une
+            // mesure. C'est lui qui attrape une divergence entre deux
+            // bibliothèques — ou entre Python et Swift — sous le même nom.
+            if let v = try e.encoder([Store.phraseTemoin], requete: false).first {
+                try store.verifierTemoin(v)
+            }
+        }
     }
 
     public func demander(_ question: String, k: Int = Retrieve.retenus) async throws -> Reponse {

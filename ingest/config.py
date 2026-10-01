@@ -35,6 +35,10 @@ CHUNK_OVERLAP_RATIO = 0.15
 #   hashing -> déterministe, sans modèle : tests et CI uniquement
 EMBED_BACKEND = os.environ.get("SURVIE_EMBEDDER", "auto")
 EMBED_MODEL = os.environ.get("SURVIE_EMBED_MODEL", "BAAI/bge-m3")
+# Un choix explicite prime toujours. Sans lui, le dépôt dépend du backend :
+# voir ingest.embed.modele_par_defaut — bge-m3 ne publie pas de safetensors,
+# que mlx-embeddings exige.
+EMBED_MODEL_EXPLICITE = "SURVIE_EMBED_MODEL" in os.environ
 EMBED_DIM = int(os.environ.get("SURVIE_EMBED_DIM", "1024"))
 EMBED_BATCH = 16
 

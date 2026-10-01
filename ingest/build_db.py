@@ -9,6 +9,7 @@ les embarquer ferait passer la base de ~200 Mo à plusieurs gigaoctets.
 
 from __future__ import annotations
 
+import base64
 import json
 import sqlite3
 import sys
@@ -121,6 +122,8 @@ def build() -> int:
         # d'erreur visible, seulement du bruit : la vérification est donc la
         # seule protection possible.
         ("embed_model", emb_meta["name"]),
+        ("embed_backend", emb_meta.get("backend", "")),
+        ("embed_temoin", _temoin_encode(emb_meta.get("temoin"))),
         ("embed_dim", str(emb_meta["dim"])),
         ("chunk_count", str(len(rows))),
         ("source_count", str(len(used))),
@@ -170,6 +173,19 @@ def _exporter_divergences() -> None:
     (config.BUILD / "divergences.json").write_text(
         json.dumps(entrees, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"  {len(entrees)} doctrines périmées -> build/divergences.json")
+
+
+def _temoin_encode(vecteur) -> str:
+    """Vecteur témoin -> base64 de float32, pour la table meta (texte).
+
+    Écrit ici pour être relu par TOUTE implémentation qui interroge l'index :
+    c'est le seul contrôle qui attrape deux bibliothèques rendant des vecteurs
+    différents sous le même nom de modèle. Voir ingest.embed.PHRASE_TEMOIN.
+    """
+    if not vecteur:
+        return ""
+    return base64.b64encode(
+        np.asarray(vecteur, dtype=np.float32).tobytes()).decode("ascii")
 
 
 def main(argv: list[str] | None = None) -> int:

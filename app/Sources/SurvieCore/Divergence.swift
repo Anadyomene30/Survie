@@ -78,6 +78,31 @@ public enum Divergences {
     /// Bloc inséré dans l'invite, AVANT les extraits : ce qui suit doit être lu
     /// à sa lumière, et un avertissement relégué en fin d'invite pèse moins
     /// qu'un texte de manuel bien tourné.
+    /// Affichage direct, en mode extraits seuls — sans modèle pour reformuler.
+    ///
+    /// Parité avec `rendu_humain` côté Python : c'est le seul avertissement que
+    /// voit l'utilisateur quand aucun modèle n'est chargé, et le mode sans
+    /// modèle est précisément celui dans lequel un extrait périmé est restitué
+    /// tel quel, sans qu'une reformulation puisse le corriger.
+    public static func renduHumain(_ divergences: [Divergence]) -> String {
+        guard !divergences.isEmpty else { return "" }
+        var l = ["", "⚠ DOCTRINES AYANT CHANGÉ — les extraits peuvent être périmés", ""]
+        for d in divergences {
+            l.append("\(d.critique ? "‼" : "•") \(d.titre)  (changement vers \(d.bascule))")
+            l.append("    Périmé : \(compacter(d.ancienne))")
+            l.append("    Actuel : \(compacter(d.actuelle))")
+            l.append("")
+        }
+        return l.joined(separator: "\n")
+    }
+
+    /// Réduit les blancs multiples à une espace : le registre YAML plie ses
+    /// textes sur plusieurs lignes, ce qui n'a pas de sens sur une sortie
+    /// terminal déjà mise en forme.
+    private static func compacter(_ s: String) -> String {
+        s.split(whereSeparator: { $0.isWhitespace }).joined(separator: " ")
+    }
+
     public static func encart(_ divergences: [Divergence],
                               ecart: (Int, Int)? = nil) -> String {
         guard !divergences.isEmpty || ecart != nil else { return "" }
