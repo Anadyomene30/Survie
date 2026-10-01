@@ -80,8 +80,6 @@ def detecter(question: str, hits: list[Hit],
     """
     registre = registre if registre is not None else charger()
     q = _plier(question)
-    extraits = _plier(" ".join(f"{h.passage.section} {h.passage.texte}" for h in hits))
-    dates = [h.passage.date for h in hits if h.passage.date]
 
     par_question, par_extraits = [], []
     for d in registre:
@@ -94,14 +92,18 @@ def detecter(question: str, hits: list[Hit],
         # D'abord un signal net : un terme composé (« faire vomir », « membre
         # sectionné ») ou deux termes distincts. Un mot isolé ne suffit pas.
         #
-        # Ensuite, et surtout : au moins un extrait doit provenir d'une source
-        # ANTÉRIEURE à la bascule. C'est la condition de fond — une doctrine
+        # Ensuite, et surtout : ce signal doit se trouver dans un extrait
+        # ANTÉRIEUR à la bascule. C'est la condition de fond — une doctrine
         # périmée ne peut être reproduite que par un document qui la précède.
-        # Si tous les extraits sont récents, il n'y a rien à corriger, et
-        # avertir quand même reviendrait à crier au loup.
-        touches = [s for s in sujets if s in extraits]
+        # Il ne suffit pas qu'un extrait ancien quelconque soit présent : sur
+        # l'index complet, une flore de 1906 retenue à côté de fiches récentes
+        # faisait avertir sur le chlore à une question sur le garrot.
+        anciens = _plier(" ".join(f"{h.passage.section} {h.passage.texte}"
+                                  for h in hits
+                                  if h.passage.date and h.passage.date < d.bascule))
+        touches = [s for s in sujets if s in anciens]
         assez_net = any(" " in s for s in touches) or len(touches) >= 2
-        if assez_net and any(dt < d.bascule for dt in dates):
+        if assez_net:
             par_extraits.append(d)
 
     # Ce que la question demande passe avant ce que les extraits évoquent.

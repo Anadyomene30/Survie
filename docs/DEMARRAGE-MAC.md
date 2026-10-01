@@ -5,12 +5,45 @@
 
 Compte deux à trois heures, dont l'essentiel en téléchargements.
 
-> **État au 11 septembre 2026.** Les étapes **1** et **6** sont faites sur ce
-> Mac : les tests passent, le Swift compile, et la parité des deux moteurs est
-> vérifiée sur les 53 questions du jeu d'évaluation. Restent **2 à 5**, qui
-> demandent toutes du réseau ou du disque : valider le modèle d'embeddings,
-> corriger le manifeste, construire l'index réel, faire tourner l'évaluation
-> avec un modèle chargé.
+> **État au 1er octobre 2026.** Les étapes **1 à 4** et **6** sont faites :
+> tests (80) et Swift (19) au vert, embedder MLX validé, manifeste réparé,
+> index construit (11 262 fragments), parité des deux moteurs sur 53 questions.
+> Reste la **5** : l'évaluation avec un modèle chargé. Elle est bloquée par le
+> disque — voir « Bloqueurs au 1er octobre » ci-dessous.
+
+## Bloqueurs au 1er octobre
+
+- **Disque plein (11 Gio libres).** Le cache Hugging Face a été vidé : ni
+  l'embedder (`mlx-community/bge-m3-mlx-fp16`, ~1,1 Go) ni le modèle de
+  langage ne sont en local. `defaut` (Mistral Small 24B 4 bit, ~13 Go) ne
+  tient pas. Sans l'embedder, l'interrogation retombe en plein texte seul.
+- **Environnement réparé.** Le 29 septembre, les sources `.py` d'une quinzaine
+  de paquets du `.venv` ont disparu (`mlx`, `torch`, `transformers`…), seuls
+  les `__pycache__` restaient : `import mlx.nn` échouait. Réinstallés aux mêmes
+  versions. Vérification : comparer chaque `RECORD` de `site-packages` au disque.
+
+## Évaluation en plein texte seul, sur l'index complet (1er octobre)
+
+`HF_HUB_OFFLINE=1 make eval` : recherche 24/26, divergences 5/5, urgence 6/6,
+identification 6/7, refus 0/3. Deux constats, à trancher avec le vrai modèle :
+
+1. **Le refus lexical ne refuse plus rien.** Les manuels anglais contiennent
+   « common », « rail », « diesel », « injection » : couverture 100 % pour une
+   question de mécanique. Fourier (32 %) et le poème (68 %) passent aussi.
+   Et en mode sémantique, `_doit_refuser` exige cos faible **ET** couverture
+   faible : il ne refusera pas davantage. Par ailleurs `SEUIL_COSINUS = 0,60`
+   est sous le plancher mesuré de bge-m3 en MLX (~0,63 pour des phrases sans
+   rapport) : le cosinus seul ne refuserait jamais. À recalibrer en mesurant
+   `cos_max` sur des questions dedans/dehors avec l'embedder chargé.
+2. **Digitale / consoude (sûreté).** La flore de Coste (1906), dense en
+   vocabulaire botanique, occupe les 8 places en lexical ; la fiche Bouriane
+   qui décrit le sosie n'est pas retenue. À revérifier en sémantique avant
+   toute retouche du classement.
+
+Corrigé : les avertissements de doctrine se déclenchaient dès qu'un extrait
+ancien *quelconque* était retenu (la flore de 1906 faisait avertir sur le
+chlore à une question sur le garrot). Le signal doit désormais venir de
+l'extrait ancien lui-même, en Python comme en Swift.
 
 ---
 

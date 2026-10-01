@@ -59,6 +59,19 @@ def test_extrait_ancien_declenche():
     assert "alcool-hypothermie" in ids
 
 
+def test_extrait_ancien_sans_rapport_ne_declenche_pas():
+    """Le signal doit venir de l'extrait ancien lui-même.
+
+    Régression sur l'index complet : une flore de 1906 retenue à côté d'une
+    fiche récente sur le chlore faisait avertir sur l'eau de Javel à une
+    question sur le garrot. Les termes étaient récents, la date venait d'ailleurs.
+    """
+    recent = hit("Chlore et cryptosporidium : faire bouillir plutôt que javelliser.", 2026)
+    flore = hit("Feuilles alternes, fleurs en grappes terminales.", 1906)
+    ids = [d.id for d in detecter("comment me réchauffer", [recent, flore], REGISTRE)]
+    assert "eau-javel-cryptosporidium" not in ids
+
+
 def test_mot_isole_ne_suffit_pas():
     """Une mention de passage ne doit pas déclencher.
 

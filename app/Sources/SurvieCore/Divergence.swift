@@ -39,9 +39,6 @@ public enum Divergences {
     public static func detecter(question: String, hits: [Retrieve.Hit],
                                 registre: [Divergence]) -> [Divergence] {
         let q = Retrieve.plier(question)
-        let extraits = Retrieve.plier(
-            hits.map { "\($0.passage.section) \($0.passage.texte)" }.joined(separator: " "))
-        let dates = hits.compactMap(\.passage.date)
 
         var parQuestion: [Divergence] = [], parExtraits: [Divergence] = []
         for d in registre {
@@ -51,13 +48,18 @@ public enum Divergences {
                 continue
             }
             // Sur les seuls extraits, deux conditions. Un signal net : terme
-            // composé ou deux termes distincts. Et surtout, au moins un extrait
-            // ANTÉRIEUR à la bascule — une doctrine périmée ne peut être
-            // reproduite que par un document qui la précède. Sans cette règle,
-            // une question sur la vipère sortait cinq avertissements.
-            let touches = sujets.filter { extraits.contains($0) }
+            // composé ou deux termes distincts. Et surtout, ce signal doit venir
+            // d'un extrait ANTÉRIEUR à la bascule — une doctrine périmée ne peut
+            // être reproduite que par un document qui la précède. Un extrait
+            // ancien quelconque ne suffit pas : une flore de 1906 faisait
+            // avertir sur le chlore à une question sur le garrot.
+            let anciens = Retrieve.plier(
+                hits.filter { ($0.passage.date ?? Int.max) < d.bascule }
+                    .map { "\($0.passage.section) \($0.passage.texte)" }
+                    .joined(separator: " "))
+            let touches = sujets.filter { anciens.contains($0) }
             let assezNet = touches.contains(where: { $0.contains(" ") }) || touches.count >= 2
-            if assezNet && dates.contains(where: { $0 < d.bascule }) {
+            if assezNet {
                 parExtraits.append(d)
             }
         }
